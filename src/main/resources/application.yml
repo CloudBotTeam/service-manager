@@ -1,0 +1,27 @@
+eureka:
+  #  instance:
+  #    hostname: client
+  #    instance-id: ${spring.application.name}:${vcap.application.instance_id:${spring.application.instance_id:${random.value}}}
+
+  client:
+    service-url: # Eureka Server注册中心的地址, 用于Client与Server进行交流
+      defaultZone: http://localhost:8100/eureka/
+
+server:
+  port: 8102
+
+spring:
+  application:
+    name: service-manager #指定服务名
+  rabbitmq:
+    host: localhost
+    port: 8672
+    username: guest
+    password: guest
+  cloud:
+    stream:
+      bindings:
+        input:
+          destination: bot-to-service
+        output:
+          destination: service-to-bot
