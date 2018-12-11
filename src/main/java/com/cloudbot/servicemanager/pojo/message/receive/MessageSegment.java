@@ -1,4 +1,4 @@
-package com.cloudbot.servicemanager.pojo.receive.message;
+package com.cloudbot.servicemanager.pojo.message.receive;
 
 /**
  * 按类型来区分的消息段

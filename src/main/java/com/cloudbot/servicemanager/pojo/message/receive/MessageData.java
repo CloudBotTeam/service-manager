@@ -1,4 +1,4 @@
-package com.cloudbot.servicemanager.pojo.receive.message;
+package com.cloudbot.servicemanager.pojo.message.receive;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

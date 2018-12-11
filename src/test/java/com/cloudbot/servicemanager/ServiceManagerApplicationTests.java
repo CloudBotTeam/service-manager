@@ -11,6 +11,9 @@ public class ServiceManagerApplicationTests {
 
     @Test
     public void contextLoads() {
+        //测试发送带图片的消息
+        //服务->MessageSender.send(Message)
+        //Message.group_id=
     }
 
 }
