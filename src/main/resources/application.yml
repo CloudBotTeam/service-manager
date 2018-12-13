@@ -15,7 +15,7 @@ spring:
     name: service-manager #指定服务名
   rabbitmq:
     host: localhost
-    port: 8672
+    port: 5672
     username: guest
     password: guest
   cloud:
