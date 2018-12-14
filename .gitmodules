@@ -1,0 +1,3 @@
+[submodule "CloudBot-Common"]
+	path = CloudBot-Common
+	url = https://github.com/CloudBotTeam/CloudBot-Common
