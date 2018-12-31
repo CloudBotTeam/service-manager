@@ -13,7 +13,7 @@ public class EchoService extends Servicer<RobotSendMessage>{
     }
 
     @SendTo(Sender.OUTPUT_CHANNEL)
-    public RobotRecvMessage sendEcho(ReceiveMessage message) {
+    public RobotRecvMessage sendEcho(RobotSendMessage message) {
         return null;
     }
 

@@ -4,6 +4,8 @@ import cn.cloudbot.common.Message.BotMessage.RobotSendMessage;
 import cn.cloudbot.servicemanager.pojo.message.receive.ReceiveMessage;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
+
+import java.util.logging.Logger;
 //import org.springframework.messaging.Message;
 
 /**
@@ -14,10 +16,12 @@ import org.springframework.cloud.stream.annotation.StreamListener;
 @EnableBinding(Sink.class)
 public class ReceiveListener {
 
+    private Logger logger = Logger.getLogger(ReceiveListener.class.getName());
+
     @StreamListener(Sink.INPUT)
     //？参数不用 Message message 是可以的吗？
     public void receive(RobotSendMessage receiveMessage) { //Message<ReceiveMessage>
-        System.out.print("收到消息：" + receiveMessage.toString());
+        logger.info("收到消息：" + receiveMessage.toString());
 
         /* findServiceByGroupId()
 

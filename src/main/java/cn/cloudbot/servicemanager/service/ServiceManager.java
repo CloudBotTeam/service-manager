@@ -19,7 +19,7 @@ public class ServiceManager {
      */
     public void async_send_data(RobotSendMessage data) {
         for (Servicer<RobotSendMessage> servicer:
-                servicerMap) {
+                servicerMap.values()) {
             if (servicer.if_accept(data)) {
                 servicer.async_send_data(data);
             }
