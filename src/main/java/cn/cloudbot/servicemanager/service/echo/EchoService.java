@@ -2,8 +2,6 @@ package cn.cloudbot.servicemanager.service.echo;
 
 import cn.cloudbot.common.Message.BotMessage.RobotSendMessage;
 import cn.cloudbot.common.Message.ServiceMessage.RobotRecvMessage;
-import cn.cloudbot.servicemanager.listener.BackSender;
-import cn.cloudbot.servicemanager.listener.MessageSendBacker;
 import cn.cloudbot.servicemanager.service.Servicer;
 import org.springframework.stereotype.Component;
 
