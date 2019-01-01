@@ -81,15 +81,11 @@
             <groupId>cloudbot.cn</groupId>
             <artifactId>common-data</artifactId>
             <version>1.0-SNAPSHOT</version>
-<<<<<<< HEAD
         </dependency>
+
         <dependency>
-            <groupId>cloudbot.cn</groupId>
-            <artifactId>common-data</artifactId>
-            <version>1.0-SNAPSHOT</version>
-=======
-            <scope>compile</scope>
->>>>>>> 73a95f9572d5ebbf9e1b38ec994f2138e2ed35c7
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-config</artifactId>
         </dependency>
     </dependencies>
 
