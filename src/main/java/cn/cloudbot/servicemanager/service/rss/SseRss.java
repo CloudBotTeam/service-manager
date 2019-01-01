@@ -1,7 +1,9 @@
 package cn.cloudbot.servicemanager.service.rss;
 
+import cn.cloudbot.servicemanager.listener.MessageSendBacker;
 import cn.cloudbot.servicemanager.pojo.message.send.SendMessage;
-import cn.cloudbot.servicemanager.sender.MessageSender;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.support.MessageBuilder;
 
 /**
  * @author: Chen Yulei
@@ -12,7 +14,9 @@ public class SseRss extends RSS {
 
     private final String KEY = "软院通知";
     private SendMessage sendMessage;
-    private MessageSender messageSender;
+
+    @Autowired
+    private MessageSendBacker messageSender;
 
     @Override
     public void run(String groupId) {
@@ -22,6 +26,6 @@ public class SseRss extends RSS {
         sendMessage.setReply("这是一条测试通知");
         sendMessage.setAuto_escape(false);
         //发送message
-        messageSender.send(sendMessage);
+        messageSender.sendData().send(MessageBuilder.withPayload(sendMessage).build());
     }
 }

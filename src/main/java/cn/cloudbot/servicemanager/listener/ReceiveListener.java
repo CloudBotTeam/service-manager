@@ -1,6 +1,8 @@
 package cn.cloudbot.servicemanager.listener;
 
 import cn.cloudbot.common.Message.BotMessage.RobotSendMessage;
+import cn.cloudbot.servicemanager.service.ServiceManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
 
@@ -15,6 +17,9 @@ import java.util.logging.Logger;
 @EnableBinding(Sink.class)
 public class ReceiveListener {
 
+    @Autowired
+    private ServiceManager serviceManager;
+
     private Logger logger = Logger.getLogger(ReceiveListener.class.getName());
 
     @StreamListener(Sink.INPUT)
@@ -23,7 +28,7 @@ public class ReceiveListener {
 
         logger.info("收到消息：" + receiveMessage.toString());
 
-
+        serviceManager.async_send_data(receiveMessage);
         /* findServiceByGroupId()
 
         // for() {

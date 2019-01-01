@@ -1,15 +1,64 @@
 package cn.cloudbot.servicemanager.service;
+import cn.cloudbot.common.Message.ServiceMessage.RobotRecvMessage;
+
+import cn.cloudbot.servicemanager.listener.BackSender;
+import cn.cloudbot.servicemanager.listener.MessageSendBacker;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.context.ApplicationContext;
+import org.springframework.messaging.support.MessageBuilder;
+
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.logging.Logger;
 
 public abstract class Servicer<T> implements Runnable {
     private String servicer_name;
-    Thread service_running_thread;
+    private Thread service_running_thread;
 
-    public Servicer(String servicer_name) {
+    private Logger logger = Logger.getLogger(Servicer.class.getName());
 
-        this.servicer_name = servicer_name;
+//    /**
+//     * Exception in thread "Thread-10" java.lang.NullPointerException
+//     at cn.cloudbot.servicemanager.service.Servicer.sendProcessedDataBack(Servicer.java:29)
+//     at cn.cloudbot.servicemanager.service.echo.EchoService.sendEcho(EchoService.java:23)
+//     at cn.cloudbot.servicemanager.service.echo.EchoService.running_logic(EchoService.java:35)
+//     at cn.cloudbot.servicemanager.service.Servicer.run(Servicer.java:82)
+//     at java.lang.Thread.run(Thread.java:745)
+//
+//     if I use new to create servicer
+//     */
+//    @Autowired
+//    private MessageSendBacker sender;
+
+    @Autowired
+    private MessageSendBacker sender;
+
+//    @Autowired
+//    private Source sourceSender;
+
+//    发送消息回给 robot.
+
+    /**
+     * 获得服务的固定名称
+     * @return
+     */
+    public abstract String serviceName();
+
+    protected void sendProcessedDataBack(RobotRecvMessage message) {
+        sender.sendData().send(MessageBuilder.withPayload(message).build());
     }
+
+//    public Servicer(String servicer_name, MessageSendBacker sender) {
+//
+//        this.servicer_name = servicer_name;
+//        this.sender = sender;
+////        this.sender = context.getBean(MessageSendBacker.class);
+////        if (this.sender == null) {
+////            logger.info("sender is still null");
+////        }
+//    }
+
     private BlockingDeque<T> data_queue = new LinkedBlockingDeque<>();
 
     /**
@@ -30,7 +79,9 @@ public abstract class Servicer<T> implements Runnable {
      * @return null if accpet
      */
     protected T get_data() throws InterruptedException {
-        return data_queue.take();
+        T data = data_queue.take();
+        logger.info(this.servicer_name + ": 收到消息 :" + data.toString());
+        return data;
     }
 
     public String getServicer_name() {

@@ -2,19 +2,31 @@ package cn.cloudbot.servicemanager.service.echo;
 
 import cn.cloudbot.common.Message.BotMessage.RobotSendMessage;
 import cn.cloudbot.common.Message.ServiceMessage.RobotRecvMessage;
-import cn.cloudbot.servicemanager.listener.Sender;
-import cn.cloudbot.servicemanager.pojo.message.receive.ReceiveMessage;
+import cn.cloudbot.servicemanager.listener.BackSender;
+import cn.cloudbot.servicemanager.listener.MessageSendBacker;
 import cn.cloudbot.servicemanager.service.Servicer;
-import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.stereotype.Component;
 
+import java.util.logging.Logger;
+
+@Component("echo")
 public class EchoService extends Servicer<RobotSendMessage>{
-    public EchoService(String service_name) {
-        super(service_name);
+    private static Logger logger = Logger.getLogger(EchoService.class.getName());
+
+
+    public void sendEcho(RobotSendMessage message) {
+        logger.info("Send Echo");
+
+        RobotRecvMessage resp = new RobotRecvMessage();
+        resp.setGroup_id(message.getGroup_id());
+        resp.setPlatform(message.getPlatform());
+        resp.setMessage(message.getMessage()[0].getData().getText());
+        sendProcessedDataBack(resp);
     }
 
-    @SendTo(Sender.OUTPUT_CHANNEL)
-    public RobotRecvMessage sendEcho(RobotSendMessage message) {
-        return null;
+    @Override
+    public String serviceName() {
+        return "echo";
     }
 
     @Override
