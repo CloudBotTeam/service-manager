@@ -77,6 +77,22 @@ public class ChannelController {
         return rss;
     }
 
+    /**
+     * 获取正在上映的电影
+     */
+    public Rss getMovie() {
+        Rss rss = restTemplate.getForObject(route + "douban/movie/playing", Rss.class);
+        return rss;
+    }
+
+    /**
+     * 获取当日bilibili放送列表
+     */
+    public Rss getBiliToday() {
+        Rss rss = restTemplate.getForObject(route + "bangumi/calendar/today", Rss.class);
+        return rss;
+    }
+
 
 
 }

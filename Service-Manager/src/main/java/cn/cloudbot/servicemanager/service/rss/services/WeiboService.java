@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.logging.Logger;
 
-/** 当收到的消息的第一段是「微博」时由此服务回复
+/**
  * @author: Hitoka
  * @since: 2019-01-02
  **/

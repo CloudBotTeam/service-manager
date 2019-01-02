@@ -22,8 +22,8 @@ import java.util.logging.Logger;
 
 @Data
 @Component
-public class WeiboHotService extends Servicer<RobotSendMessage> {
-    private static Logger logger = Logger.getLogger(WeiboService.class.getName());
+public class BiliTodayService extends Servicer<RobotSendMessage> {
+    private static Logger logger = Logger.getLogger(BiliTodayService.class.getName());
 
     @Autowired
     private ChannelController channelController;
@@ -40,7 +40,7 @@ public class WeiboHotService extends Servicer<RobotSendMessage> {
     public Boolean isSentToMe() {
         // 默认第一段消息是命令
         this.receivedMsg =  this.message.getMessage();
-        if (this.receivedMsg[0].getData().getText().equals("热搜")) {
+        if (this.receivedMsg[0].getData().getText().equals("放送")) {
             // 初始化要回复的消息
             this.sendMsg.setGroup_id(this.message.getGroup_id());
             this.sendMsg.setPlatform(this.message.getPlatform());
@@ -51,27 +51,46 @@ public class WeiboHotService extends Servicer<RobotSendMessage> {
     }
 
     public void sendBack() {
-        Rss rss = channelController.getWeiboHot();
+        Rss rss = channelController.getBiliToday();
         StringBuilder hot = new StringBuilder();
         ArrayList<ChannelItem> items = rss.getChannel().getItems();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < items.size(); i++) {
             hot.append(items.get(i).getTitle() + '\n');
         }
-        hot.append("查看更多->https://s.weibo.com/top/summary?cate=realtimehot");
         sendMsg.setMessage(hot.toString());
-        logger.info("[send] hot service sent " + sendMsg);
+        logger.info("[send] bangumi service sent " + sendMsg);
         sendProcessedDataBack(sendMsg);
     }
 
+    // 每天
+    public void autoRss() {
+        while (true) {
+            logger.info("[request] bangumi requests");
+            Rss rss = channelController.getBiliToday();
+            StringBuilder hot = new StringBuilder();
+            ArrayList<ChannelItem> items = rss.getChannel().getItems();
+            for (int i = 0; i < items.size(); i++) {
+                hot.append(items.get(i).getTitle() + '\n');
+            }
+            sendMsg.setMessage(hot.toString());
+            logger.info("[send] bangumi service sent " + sendMsg);
+            sendProcessedDataBack(sendMsg);
+            try {
+                Thread.sleep(86400000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     @Override
     public String serviceName() {
-        return "hot";
+        return "bangumi";
     }
 
     @Override
     public boolean if_accept(RobotSendMessage data) {
-        logger.info("[Accept] hot service accepted the message.");
+        logger.info("[Accept] bangumi service accepted the message.");
         return true;
     }
 

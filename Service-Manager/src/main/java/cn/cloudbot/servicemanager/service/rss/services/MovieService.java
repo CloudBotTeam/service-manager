@@ -22,14 +22,11 @@ import java.util.logging.Logger;
 
 @Data
 @Component
-public class WeiboHotService extends Servicer<RobotSendMessage> {
-    private static Logger logger = Logger.getLogger(WeiboService.class.getName());
+public class MovieService extends Servicer<RobotSendMessage> {
+    private static Logger logger = Logger.getLogger(MovieService.class.getName());
 
     @Autowired
     private ChannelController channelController;
-
-    @Autowired
-    private RedisTemplate redisTemplate;
 
     private RobotSendMessage message;
 
@@ -40,7 +37,7 @@ public class WeiboHotService extends Servicer<RobotSendMessage> {
     public Boolean isSentToMe() {
         // 默认第一段消息是命令
         this.receivedMsg =  this.message.getMessage();
-        if (this.receivedMsg[0].getData().getText().equals("热搜")) {
+        if (this.receivedMsg[0].getData().getText().equals("电影")) {
             // 初始化要回复的消息
             this.sendMsg.setGroup_id(this.message.getGroup_id());
             this.sendMsg.setPlatform(this.message.getPlatform());
@@ -51,27 +48,49 @@ public class WeiboHotService extends Servicer<RobotSendMessage> {
     }
 
     public void sendBack() {
-        Rss rss = channelController.getWeiboHot();
+        Rss rss = channelController.getMovie();
         StringBuilder hot = new StringBuilder();
         ArrayList<ChannelItem> items = rss.getChannel().getItems();
         for (int i = 0; i < 10; i++) {
             hot.append(items.get(i).getTitle() + '\n');
         }
-        hot.append("查看更多->https://s.weibo.com/top/summary?cate=realtimehot");
+        hot.append("查看更多->https://movie.douban.com/cinema/nowplaying");
         sendMsg.setMessage(hot.toString());
-        logger.info("[send] hot service sent " + sendMsg);
+        logger.info("[send] movie service sent " + sendMsg);
         sendProcessedDataBack(sendMsg);
+    }
+
+    // 每天
+    public void autoRss() {
+        while (true) {
+            logger.info("[request] movie requests");
+            Rss rss = channelController.getMovie();
+            StringBuilder hot = new StringBuilder();
+            ArrayList<ChannelItem> items = rss.getChannel().getItems();
+            for (int i = 0; i < 10; i++) {
+                hot.append(items.get(i).getTitle() + '\n');
+            }
+            hot.append("查看更多->https://movie.douban.com/cinema/nowplaying");
+            sendMsg.setMessage(hot.toString());
+            logger.info("[send] movie service sent " + sendMsg);
+            sendProcessedDataBack(sendMsg);
+            try {
+                Thread.sleep(86400000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 
     @Override
     public String serviceName() {
-        return "hot";
+        return "movie";
     }
 
     @Override
     public boolean if_accept(RobotSendMessage data) {
-        logger.info("[Accept] hot service accepted the message.");
+        logger.info("[Accept] movie service accepted the message.");
         return true;
     }
 

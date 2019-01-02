@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
-/** 当收到的消息的第一段是「热搜」时由此服务回复
+/**
  * @author: Hitoka
  * @since: 2019-01-02
  **/
@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 @Data
 @Component
 public class JuejinService extends Servicer<RobotSendMessage> {
-    private static Logger logger = Logger.getLogger(WeiboService.class.getName());
+    private static Logger logger = Logger.getLogger(JuejinService.class.getName());
 
     @Autowired
     private ChannelController channelController;
