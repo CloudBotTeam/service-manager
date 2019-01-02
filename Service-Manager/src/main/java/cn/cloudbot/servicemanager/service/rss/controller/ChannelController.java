@@ -43,10 +43,21 @@ public class ChannelController {
      * @return Rss(json)
      */
 //    @RequestMapping(value = "/weibo/user/{uid}", method = RequestMethod.GET)
-    public Rss getWeiboByUserId(@PathVariable String uid) {
+    public Rss getWeiboByUserId(String uid) {
         Rss rss = restTemplate.getForObject(route + "/weibo/user/" + uid, Rss.class);
         return rss;
     }
+
+    /**
+     *
+     * @param uid
+     * @return
+     */
+    public Rss getBilibiliByUserId(String uid) {
+        Rss rss = restTemplate.getForObject(route + "/bilibili/user/video/" + uid, Rss.class);
+        return rss;
+    }
+
 
 
 }
