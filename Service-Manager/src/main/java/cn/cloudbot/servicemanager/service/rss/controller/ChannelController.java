@@ -49,12 +49,31 @@ public class ChannelController {
     }
 
     /**
-     *
+     * 获取微博热搜
+     * @return
+     */
+    public Rss getWeiboHot() {
+        Rss rss = restTemplate.getForObject(route + "weibo/search/hot", Rss.class);
+        return rss;
+    }
+
+    /**
+     * 获取某 up 主的视频列表
      * @param uid
      * @return
      */
     public Rss getBilibiliByUserId(String uid) {
         Rss rss = restTemplate.getForObject(route + "/bilibili/user/video/" + uid, Rss.class);
+        return rss;
+    }
+
+    /**
+     * 获取掘金文章 by type
+     * @param type
+     * @return
+     */
+    public Rss getJuejinByType(String type) {
+        Rss rss = restTemplate.getForObject(route + "juejin/category/" + type, Rss.class);
         return rss;
     }
 

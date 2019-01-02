@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * 同济大学软件学院通知
@@ -29,6 +29,6 @@ public class Channel implements Serializable {
 
     @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty(localName = "item")
-    private List<ChannelItem> items;
+    private ArrayList<ChannelItem> items;
 
 }
