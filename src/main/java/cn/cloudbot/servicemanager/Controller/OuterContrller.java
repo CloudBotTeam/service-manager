@@ -1,4 +1,4 @@
-package cn.cloudgroup.servicemanager.Controller;
+package cn.cloudbot.servicemanager.Controller;
 
 import lombok.*;
 import org.springframework.beans.factory.annotation.Autowired;
