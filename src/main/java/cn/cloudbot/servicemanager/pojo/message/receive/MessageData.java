@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MessageData {
 
-    private final String text;
-    private final String url;
-    private final String file;
-    private final String face;
+//    private final String text;
+//    private final String url;
+//    private final String file;
+//    private final String face;
 }

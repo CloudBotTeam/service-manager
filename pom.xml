@@ -11,9 +11,9 @@
     <groupId>cn.cloudbot</groupId>
     <artifactId>service-manager</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <modules>
-        <module>CloudBot-Common</module>
-    </modules>
+    <!--<modules>-->
+        <!--<module>CloudBot-Common</module>-->
+    <!--</modules>-->
     <packaging>jar</packaging>
     <name>service-manager</name>
     <description>Demo project for Spring Boot</description>
@@ -107,6 +107,8 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+
+
         </plugins>
     </build>
 
@@ -126,7 +128,19 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+
+        <repository>
+            <id>spring-releases</id>
+            <url>https://repo.spring.io/libs-release</url>
+        </repository>
+
     </repositories>
 
+    <pluginRepositories>
+        <pluginRepository>
+            <id>spring-releases</id>
+            <url>https://repo.spring.io/libs-release</url>
+        </pluginRepository>
+    </pluginRepositories>
 
 </project>
