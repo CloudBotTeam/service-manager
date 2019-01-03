@@ -8,6 +8,7 @@ import cn.cloudbot.servicemanager.service.rss.controller.ChannelController;
 import cn.cloudbot.servicemanager.service.rss.pojo.Rss;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
 
 import java.util.logging.Logger;
 
@@ -15,6 +16,7 @@ import java.util.logging.Logger;
  * @author: Hitoka
  * @since: 2019-01-02
  **/
+@Component("anitamashii")
 public class BilibiliService extends Servicer<RobotSendMessage> {
     private static Logger logger = Logger.getLogger(BilibiliService.class.getName());
 
@@ -47,6 +49,7 @@ public class BilibiliService extends Servicer<RobotSendMessage> {
         Rss rss = channelController.getBilibiliByUserId("11357018");
         sendMsg.setMessage("AnimeTamashii最新视频："+ rss.getChannel().getItems().get(0).getTitle() +
                 "\n点击查看详情->" + rss.getChannel().getItems().get(0).getLink());
+
         logger.info("[send] bilibili service sent " + sendMsg);
         sendProcessedDataBack(sendMsg);
     }
@@ -81,13 +84,13 @@ public class BilibiliService extends Servicer<RobotSendMessage> {
 
     @Override
     public String serviceName() {
-        return "bilibili";
+        return "anitamashii";
     }
 
     @Override
     public boolean if_accept(RobotSendMessage data) {
         logger.info("[Accept] bilibili service accepted the message.");
-        return true;
+        return false;
     }
 
     @Override

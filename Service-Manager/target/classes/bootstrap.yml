@@ -1,0 +1,7 @@
+# Spring Cloud Config 配置信息
+spring:
+  cloud:
+    config:
+      profile: dev
+      label: master
+      uri: http://localhost:7001/ # config-server地址

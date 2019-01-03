@@ -33,7 +33,7 @@ public class ServiceManager {
 
     @PostConstruct
     public void setEchoTest() {
-        logger.info("尼玛的，老夫的 POST CONSTRUCT 启动了");
+
         this.add_servicer("echo");
     }
 

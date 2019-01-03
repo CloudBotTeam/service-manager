@@ -19,6 +19,7 @@ public class EchoService extends Servicer<RobotSendMessage>{
         resp.setGroup_id(message.getGroup_id());
         resp.setPlatform(message.getPlatform());
         resp.setMessage(message.getMessage()[0].getData().getText());
+        logger.info("send " + resp + " back");
         sendProcessedDataBack(resp);
     }
 

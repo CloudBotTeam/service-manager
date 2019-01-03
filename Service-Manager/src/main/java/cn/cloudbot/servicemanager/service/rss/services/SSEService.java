@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  * @author: Hitoka
  * @since: 2019-01-02
  **/
-@Component
+@Component("sse")
 public class SSEService extends Servicer<RobotSendMessage> {
     private static Logger logger = Logger.getLogger(SSEService.class.getName());
 
@@ -83,7 +83,7 @@ public class SSEService extends Servicer<RobotSendMessage> {
 
     @Override
     public String serviceName() {
-        return "notice";
+        return "sse";
     }
 
     @Override

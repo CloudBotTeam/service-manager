@@ -19,7 +19,7 @@ import java.util.logging.Logger;
  **/
 
 @Data
-@Component
+@Component("weibo-lin")
 public class WeiboService extends Servicer<RobotSendMessage> {
     private static Logger logger = Logger.getLogger(WeiboService.class.getName());
 
@@ -87,7 +87,7 @@ public class WeiboService extends Servicer<RobotSendMessage> {
 
     @Override
     public String serviceName() {
-        return "weibo";
+        return "weibo-lin";
     }
 
     @Override

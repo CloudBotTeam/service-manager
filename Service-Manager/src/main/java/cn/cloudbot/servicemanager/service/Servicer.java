@@ -3,6 +3,7 @@ import cn.cloudbot.common.Message.ServiceMessage.RobotRecvMessage;
 
 import cn.cloudbot.servicemanager.listener.BackSender;
 import cn.cloudbot.servicemanager.listener.MessageSendBacker;
+import cn.cloudbot.servicemanager.service.rss.pojo.ServicePOJO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.ApplicationContext;
@@ -13,7 +14,6 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.logging.Logger;
 
 public abstract class Servicer<T> implements Runnable {
-    private String servicer_name;
     private Thread service_running_thread;
 
     private Logger logger = Logger.getLogger(Servicer.class.getName());
@@ -80,12 +80,8 @@ public abstract class Servicer<T> implements Runnable {
      */
     protected T get_data() throws InterruptedException {
         T data = data_queue.take();
-        logger.info(this.servicer_name + ": 收到消息 :" + data.toString());
+        logger.info(this.serviceName() + ": 收到消息 :" + data.toString());
         return data;
-    }
-
-    public String getServicer_name() {
-        return servicer_name;
     }
 
     /**
@@ -109,5 +105,12 @@ public abstract class Servicer<T> implements Runnable {
         } catch (InterruptedException e) {
             return;
         }
+    }
+
+    public ServicePOJO toServicePojo() {
+        ServicePOJO pojo = new ServicePOJO();
+        pojo.setServ_id(this.serviceName());
+        pojo.setServ_name(this.serviceName());
+        return pojo;
     }
 }
