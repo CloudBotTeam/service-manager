@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  **/
 
 @Data
-@Component
+@Component("bangumi")
 public class BiliTodayService extends Servicer<RobotSendMessage> {
     private static Logger logger = Logger.getLogger(BiliTodayService.class.getName());
 
@@ -36,6 +36,31 @@ public class BiliTodayService extends Servicer<RobotSendMessage> {
     private RobotSendMessageSegment[] receivedMsg;
 
     private RobotRecvMessage sendMsg;
+
+    // 每天
+    public class AutoBiliToday implements Runnable{
+        @Override
+        public void run() {
+            while (true) {
+                logger.info("[request] bangumi requests");
+                Rss rss = channelController.getBiliToday();
+                StringBuilder hot = new StringBuilder();
+                ArrayList<ChannelItem> items = rss.getChannel().getItems();
+                for (int i = 0; i < items.size(); i++) {
+                    hot.append(items.get(i).getTitle() + '\n');
+                }
+//                sendMsg.setMessage(hot.toString());
+                logger.info("[send] bangumi service sent " + hot.toString());
+                sendBroadcast(hot.toString());
+                try {
+                    Thread.sleep(86400000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
 
     public Boolean isSentToMe() {
         // 默认第一段消息是命令
@@ -62,27 +87,6 @@ public class BiliTodayService extends Servicer<RobotSendMessage> {
         sendProcessedDataBack(sendMsg);
     }
 
-    // 每天
-    public void autoRss() {
-        while (true) {
-            logger.info("[request] bangumi requests");
-            Rss rss = channelController.getBiliToday();
-            StringBuilder hot = new StringBuilder();
-            ArrayList<ChannelItem> items = rss.getChannel().getItems();
-            for (int i = 0; i < items.size(); i++) {
-                hot.append(items.get(i).getTitle() + '\n');
-            }
-            sendMsg.setMessage(hot.toString());
-            logger.info("[send] bangumi service sent " + sendMsg);
-            sendProcessedDataBack(sendMsg);
-            try {
-                Thread.sleep(86400000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     @Override
     public String serviceName() {
         return "bangumi";
@@ -90,15 +94,21 @@ public class BiliTodayService extends Servicer<RobotSendMessage> {
 
     @Override
     public boolean if_accept(RobotSendMessage data) {
+        // 每一条都收
         logger.info("[Accept] bangumi service accepted the message.");
         return true;
     }
 
     @Override
     public void running_logic() throws InterruptedException {
-        this.message = this.get_data();
-        if (isSentToMe()) {
-            sendBack();
+        Thread autoRss = new Thread(new AutoBiliToday());
+        autoRss.setDaemon(true);
+        autoRss.start();
+        while (true) {
+            this.message = this.get_data();
+            if (isSentToMe()) {
+                sendBack();
+            }
         }
     }
 }

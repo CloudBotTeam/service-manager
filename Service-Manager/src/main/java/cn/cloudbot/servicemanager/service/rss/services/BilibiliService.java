@@ -32,14 +32,51 @@ public class BilibiliService extends Servicer<RobotSendMessage> {
 
     private RobotRecvMessage sendMsg;
 
+    // 自动推送子线程
+    // 每 30s 请求一次
+    public class AutoBilibili implements Runnable{
+        @Override
+        public void run() {
+            while (true) {
+                logger.info("[request] anitamashii requests");
+                Rss rss = channelController.getBiliToday();
+                Rss redisRss = (Rss) redisTemplate.opsForValue().get("anitamashii");
+                if (redisRss == null) {
+                    redisTemplate.opsForValue().set("anitamashii", rss);
+                }
+                else {
+                    if (rss.getChannel().getItems().get(0).getPubDate() == redisRss.getChannel().getItems().get(0).getPubDate()) {
+                        logger.info("No new anitamashii video update.");
+                    }
+                    else {
+                        redisTemplate.opsForValue().set("anitamashii", rss);
+
+                        String broadcastMsg = "AnimeTamashii发新视频啦：" + rss.getChannel().getItems().get(0).getTitle() +
+                                "\n点击查看->" + rss.getChannel().getItems().get(0).getLink();
+                        sendBroadcast(broadcastMsg);
+                    }
+                }
+                try {
+                    Thread.sleep(30000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public void initSendMsg() {
+        // 初始化要回复的消息
+        this.sendMsg.setGroup_id(this.message.getGroup_id());
+        this.sendMsg.setPlatform(this.message.getPlatform());
+        this.sendMsg.setMessage(this.message.getMessage()[0].getData().getText());
+    }
+
     public Boolean isSentToMe() {
         // 默认第一段消息是命令
         this.receivedMsg =  this.message.getMessage();
         if (this.receivedMsg[0].getData().getText().equals("哔哩哔哩")) {
-            // 初始化要回复的消息
-            this.sendMsg.setGroup_id(this.message.getGroup_id());
-            this.sendMsg.setPlatform(this.message.getPlatform());
-            this.sendMsg.setMessage(this.message.getMessage()[0].getData().getText());
+            initSendMsg();
             return true;
         }
         return false;
@@ -50,36 +87,8 @@ public class BilibiliService extends Servicer<RobotSendMessage> {
         sendMsg.setMessage("AnimeTamashii最新视频："+ rss.getChannel().getItems().get(0).getTitle() +
                 "\n点击查看详情->" + rss.getChannel().getItems().get(0).getLink());
 
-        logger.info("[send] bilibili service sent " + sendMsg);
+        logger.info("[send] anitamashii service sent " + sendMsg);
         sendProcessedDataBack(sendMsg);
-    }
-
-    // 每 30s 请求一次
-    public void autoRss() {
-        while (true) {
-            logger.info("[request] bilibili requests");
-            Rss rss = channelController.getTJUSSExwdt();
-            Rss redisRss = (Rss) redisTemplate.opsForValue().get("bilibili");
-            if (redisRss == null) {
-                redisTemplate.opsForValue().set("bilibili", rss);
-            }
-            else {
-                if (rss.getChannel().getItems().get(0).getPubDate() == redisRss.getChannel().getItems().get(0).getPubDate()) {
-                    logger.info("No bilibili video update.");
-                }
-                else {
-                    redisTemplate.opsForValue().set("bilibili", rss);
-                    sendMsg.setMessage("AnimeTamashii发新视频啦：" + rss.getChannel().getItems().get(0).getTitle() +
-                            "\n点击查看->" + rss.getChannel().getItems().get(0).getLink());
-                    sendProcessedDataBack(sendMsg);
-                }
-            }
-            try {
-                Thread.sleep(30000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     @Override
@@ -89,15 +98,23 @@ public class BilibiliService extends Servicer<RobotSendMessage> {
 
     @Override
     public boolean if_accept(RobotSendMessage data) {
-        logger.info("[Accept] bilibili service accepted the message.");
-        return false;
+        // 每条都收
+        logger.info("[Accept] anitamashii service accepted the message.");
+        return true;
     }
 
     @Override
     public void running_logic() throws InterruptedException {
-        this.message = this.get_data();
-        if (isSentToMe()) {
-            sendBack();
+        // 自动推送子线程
+        Thread autoRss = new Thread(new AutoBilibili());
+        autoRss.setDaemon(true);
+        autoRss.start();
+        while (true) {
+            this.message = this.get_data(); // 阻塞直到收到消息
+            if (isSentToMe()) {
+                logger.info("[Service] anitamashii service replied.");
+                sendBack();
+            }
         }
     }
 }

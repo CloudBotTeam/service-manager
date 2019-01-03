@@ -35,10 +35,41 @@ public class WeiboService extends Servicer<RobotSendMessage> {
 
     private RobotRecvMessage sendMsg;
 
+    // 每 10s 请求一次林俊杰的微博
+    public class AutoWeibo implements Runnable {
+        @Override
+        public void run() {
+            while (true) {
+                logger.info("[request] weibo-lin requests");
+                Rss rss = channelController.getTJUSSExwdt();
+                Rss redisRss = (Rss) redisTemplate.opsForValue().get("weibo-lin");
+                if (redisRss == null) {
+                    redisTemplate.opsForValue().set("weibo-lin", rss);
+                }
+                else {
+                    if (rss.getChannel().getItems().get(0).getPubDate() == redisRss.getChannel().getItems().get(0).getPubDate()) {
+                        logger.info("No weibo-lin update.");
+                    }
+                    else {
+                        redisTemplate.opsForValue().set("weibo-lin", rss);
+                        String broadcastMsg = "林俊杰更新微博啦：" + rss.getChannel().getItems().get(0).getTitle() +
+                                "\n点击查看详情->" + rss.getChannel().getItems().get(0).getLink();
+                        sendBroadcast(broadcastMsg);
+                    }
+                }
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
     public Boolean isSentToMe() {
         // 默认第一段消息是命令
         this.receivedMsg =  this.message.getMessage();
-        if (this.receivedMsg[0].getData().getText().equals("微博")) {
+        if (this.receivedMsg[0].getData().getText().equals("微博林俊杰")) {
             // 初始化要回复的消息
             this.sendMsg.setGroup_id(this.message.getGroup_id());
             this.sendMsg.setPlatform(this.message.getPlatform());
@@ -56,34 +87,6 @@ public class WeiboService extends Servicer<RobotSendMessage> {
         sendProcessedDataBack(sendMsg);
     }
 
-    // 每 10s 请求一次林俊杰的微博
-    public void autoRss() {
-        while (true) {
-            logger.info("[request] weibo requests");
-            Rss rss = channelController.getTJUSSExwdt();
-            Rss redisRss = (Rss) redisTemplate.opsForValue().get("weibo");
-            if (redisRss == null) {
-                redisTemplate.opsForValue().set("weibo", rss);
-            }
-            else {
-                if (rss.getChannel().getItems().get(0).getPubDate() == redisRss.getChannel().getItems().get(0).getPubDate()) {
-                    logger.info("No weibo update.");
-                }
-                else {
-                    redisTemplate.opsForValue().set("weibo", rss);
-                    sendMsg.setMessage("林俊杰更新微博啦：" + rss.getChannel().getItems().get(0).getTitle() +
-                            "\n点击查看详情->" + rss.getChannel().getItems().get(0).getLink());
-                    sendProcessedDataBack(sendMsg);
-                }
-            }
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
 
     @Override
     public String serviceName() {
@@ -92,15 +95,21 @@ public class WeiboService extends Servicer<RobotSendMessage> {
 
     @Override
     public boolean if_accept(RobotSendMessage data) {
+        // 每条都收
         logger.info("[Accept] weibo service accepted the message.");
         return true;
     }
 
     @Override
     public void running_logic() throws InterruptedException {
-        this.message = this.get_data();
-        if (isSentToMe()) {
-            sendBack();
+        Thread autoRss = new Thread(new AutoWeibo());
+        autoRss.setDaemon(true);
+        autoRss.start();
+        while (true) {
+            this.message = this.get_data();
+            if (isSentToMe()) {
+                sendBack();
+            }
         }
     }
 }

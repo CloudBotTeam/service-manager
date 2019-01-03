@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  **/
 
 @Data
-@Component
+@Component("movie")
 public class MovieService extends Servicer<RobotSendMessage> {
     private static Logger logger = Logger.getLogger(MovieService.class.getName());
 
@@ -33,6 +33,32 @@ public class MovieService extends Servicer<RobotSendMessage> {
     private RobotSendMessageSegment[] receivedMsg;
 
     private RobotRecvMessage sendMsg;
+
+    // auto rss every day
+    public class AutoMovie implements Runnable {
+        @Override
+        public void run() {
+            while (true) {
+                logger.info("[request] movie requests");
+                Rss rss = channelController.getMovie();
+                StringBuilder hot = new StringBuilder();
+                ArrayList<ChannelItem> items = rss.getChannel().getItems();
+                for (int i = 0; i < 10; i++) {
+                    hot.append(items.get(i).getTitle() + '\n');
+                }
+                hot.append("查看更多->https://movie.douban.com/cinema/nowplaying");
+//                sendMsg.setMessage(hot.toString());
+                logger.info("[send] movie service sent " + hot.toString());
+//                sendProcessedDataBack(sendMsg);
+                sendBroadcast(hot.toString());
+                try {
+                    Thread.sleep(86400000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
     public Boolean isSentToMe() {
         // 默认第一段消息是命令
@@ -60,29 +86,6 @@ public class MovieService extends Servicer<RobotSendMessage> {
         sendProcessedDataBack(sendMsg);
     }
 
-    // 每天
-    public void autoRss() {
-        while (true) {
-            logger.info("[request] movie requests");
-            Rss rss = channelController.getMovie();
-            StringBuilder hot = new StringBuilder();
-            ArrayList<ChannelItem> items = rss.getChannel().getItems();
-            for (int i = 0; i < 10; i++) {
-                hot.append(items.get(i).getTitle() + '\n');
-            }
-            hot.append("查看更多->https://movie.douban.com/cinema/nowplaying");
-            sendMsg.setMessage(hot.toString());
-            logger.info("[send] movie service sent " + sendMsg);
-            sendProcessedDataBack(sendMsg);
-            try {
-                Thread.sleep(86400000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-
     @Override
     public String serviceName() {
         return "movie";
@@ -90,15 +93,21 @@ public class MovieService extends Servicer<RobotSendMessage> {
 
     @Override
     public boolean if_accept(RobotSendMessage data) {
+        // 每条都收
         logger.info("[Accept] movie service accepted the message.");
-        return true;
+        return false;
     }
 
     @Override
     public void running_logic() throws InterruptedException {
-        this.message = this.get_data();
-        if (isSentToMe()) {
-            sendBack();
+        Thread autoRss = new Thread(new AutoMovie());
+        autoRss.setDaemon(true);
+        autoRss.start();
+        while (true) {
+            this.message = this.get_data();
+            if (isSentToMe()) {
+                sendBack();
+            }
         }
     }
 }

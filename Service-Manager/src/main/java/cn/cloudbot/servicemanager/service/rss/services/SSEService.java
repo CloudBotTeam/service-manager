@@ -32,10 +32,41 @@ public class SSEService extends Servicer<RobotSendMessage> {
 
     private RobotRecvMessage sendMsg;
 
+    // every hour
+    public class AutoSSE implements Runnable {
+        @Override
+        public void run() {
+            while (true) {
+                logger.info("[request] sse requests");
+                Rss rss = channelController.getTJUSSExwdt();
+                Rss redisRss = (Rss) redisTemplate.opsForValue().get("sse");
+                if (redisRss == null) {
+                    redisTemplate.opsForValue().set("sse", rss);
+                }
+                else {
+                    if (rss.getChannel().getItems().get(0).getPubDate() == redisRss.getChannel().getItems().get(0).getPubDate()) {
+                        logger.info("No sse update.");
+                    }
+                    else {
+                        redisTemplate.opsForValue().set("sse", rss);
+                        String broadcastMsg = "学院官网有新通知啦：" + rss.getChannel().getItems().get(0).getTitle() +
+                                "\n点击查看->" + rss.getChannel().getItems().get(0).getLink();
+                        sendBroadcast(broadcastMsg);
+                    }
+                }
+                try {
+                    Thread.sleep(3600000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
     public Boolean isSentToMe() {
         // 默认第一段消息是命令
         this.receivedMsg =  this.message.getMessage();
-        if (this.receivedMsg[0].getData().getText().equals("通知")) {
+        if (this.receivedMsg[0].getData().getText().equals("软院通知")) {
             // 初始化要回复的消息
             this.sendMsg.setGroup_id(this.message.getGroup_id());
             this.sendMsg.setPlatform(this.message.getPlatform());
@@ -49,37 +80,10 @@ public class SSEService extends Servicer<RobotSendMessage> {
         Rss rss = channelController.getTJUSSExwdt();
         sendMsg.setMessage("学院网最新通知："+ rss.getChannel().getItems().get(0).getTitle() +
                 "\n点击查看详情->" + rss.getChannel().getItems().get(0).getLink());
-        logger.info("[send] notice service sent " + sendMsg);
+        logger.info("[send] sse service sent " + sendMsg);
         sendProcessedDataBack(sendMsg);
     }
 
-    // 每1小时自动获取一次软院通知请求一次
-    public void autoRss() {
-        while (true) {
-            logger.info("[request] notice requests");
-            Rss rss = channelController.getTJUSSExwdt();
-            Rss redisRss = (Rss) redisTemplate.opsForValue().get("notice");
-            if (redisRss == null) {
-                redisTemplate.opsForValue().set("notice", rss);
-            }
-            else {
-                if (rss.getChannel().getItems().get(0).getPubDate() == redisRss.getChannel().getItems().get(0).getPubDate()) {
-                    logger.info("No notice update.");
-                }
-                else {
-                    redisTemplate.opsForValue().set("notice", rss);
-                    sendMsg.setMessage("学院官网有新通知啦：" + rss.getChannel().getItems().get(0).getTitle() +
-                            "\n点击查看->" + rss.getChannel().getItems().get(0).getLink());
-                    sendProcessedDataBack(sendMsg);
-                }
-            }
-            try {
-                Thread.sleep(3600000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
     @Override
     public String serviceName() {
@@ -88,15 +92,21 @@ public class SSEService extends Servicer<RobotSendMessage> {
 
     @Override
     public boolean if_accept(RobotSendMessage data) {
-        logger.info("[Accept] notice service accepted the message.");
+        // 每条都收
+        logger.info("[Accept] sse service accepted the message.");
         return true;
     }
 
     @Override
     public void running_logic() throws InterruptedException {
-        this.message = this.get_data();
-        if (isSentToMe()) {
-            sendBack();
+        Thread autoRss = new Thread(new AutoSSE());
+        autoRss.setDaemon(true);
+        autoRss.start();
+        while (true) {
+            this.message = this.get_data();
+            if (isSentToMe()) {
+                sendBack();
+            }
         }
     }
 }

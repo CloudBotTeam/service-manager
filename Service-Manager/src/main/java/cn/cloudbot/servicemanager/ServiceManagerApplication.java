@@ -15,8 +15,8 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableBinding(value = {Sink.class, MessageSendBacker.class})
-@EnableAutoConfiguration
-@ComponentScan
+//@EnableAutoConfiguration
+//@ComponentScan
 public class ServiceManagerApplication {
 
     public static void main(String[] args) {
