@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  **/
 
 @Data
-@Component
+@Component("hot")
 public class WeiboHotService extends Servicer<RobotSendMessage> {
     private static Logger logger = Logger.getLogger(WeiboService.class.getName());
 
@@ -77,9 +77,11 @@ public class WeiboHotService extends Servicer<RobotSendMessage> {
 
     @Override
     public void running_logic() throws InterruptedException {
-        this.message = this.get_data();
-        if (isSentToMe()) {
-            sendBack();
+        while (true) {
+            this.message = this.get_data();
+            if (isSentToMe()) {
+                sendBack();
+            }
         }
     }
 }

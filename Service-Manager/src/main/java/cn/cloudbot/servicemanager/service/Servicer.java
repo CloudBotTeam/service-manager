@@ -49,6 +49,10 @@ public abstract class Servicer<T> implements Runnable {
         sender.sendProcessedDataBack(message);
     }
 
+
+    protected void sendBroadcast(String message) {
+        logger.info("send broadcast " + message);
+    }
 //    public Servicer(String servicer_name, MessageSendBacker sender) {
 //
 //        this.servicer_name = servicer_name;

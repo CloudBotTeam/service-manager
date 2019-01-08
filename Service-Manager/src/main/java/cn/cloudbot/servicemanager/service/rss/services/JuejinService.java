@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  **/
 
 @Data
-@Component
+@Component("juejin")
 public class JuejinService extends Servicer<RobotSendMessage> {
     private static Logger logger = Logger.getLogger(JuejinService.class.getName());
 
@@ -92,15 +92,18 @@ public class JuejinService extends Servicer<RobotSendMessage> {
 
     @Override
     public boolean if_accept(RobotSendMessage data) {
+        // 每一条都收
         logger.info("[Accept] juejin service accepted the message.");
-        return true;
+        return false;
     }
 
     @Override
     public void running_logic() throws InterruptedException {
-        this.message = this.get_data();
-        if (isSentToMe()) {
-            sendBack();
+        while (true) {
+            this.message = this.get_data();
+            if (isSentToMe()) {
+                sendBack();
+            }
         }
     }
 }
