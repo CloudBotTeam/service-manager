@@ -1,34 +1,30 @@
 package cn.cloudbot.servicemanager.listener;
 
 import cn.cloudbot.common.Message.BotMessage.RobotSendMessage;
+import cn.cloudbot.common.Message2.RobotSendMessage2;
 import cn.cloudbot.servicemanager.service.ServiceManager;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
 
 import java.util.logging.Logger;
-//import org.springframework.messaging.Message;
 
-/**
- * 监听从 botManager 发来的消息
- * @author: Chen Yulei
- * @since: 2018-12-10
- **/
-@EnableBinding(Sink.class)
-public class ReceiveListener {
-
+public class ReceiveListener2 {
     @Autowired
     private ServiceManager serviceManager;
 
     private Logger logger = Logger.getLogger(ReceiveListener.class.getName());
 
-    @StreamListener(Sink.INPUT)
+    @StreamListener(MessageListener2.INPUT)
     //？参数不用 Message message 是可以的吗？
-    public void receive(RobotSendMessage receiveMessage) { //Message<ReceiveMessage>
+    public void receive(RobotSendMessage2 receiveMessage) { //Message<ReceiveMessage>
 
         logger.info("收到消息：" + receiveMessage.toString());
 
-//        serviceManager.async_send_data(receiveMessage);
+        for (String serv_name:
+             receiveMessage.getServices()) {
+            logger.info("Send data " + receiveMessage + " to service " + serv_name);
+            serviceManager.async_send_to_servicer2(receiveMessage, serv_name);
+        }
         /* findServiceByGroupId()
 
         // for() {
@@ -42,8 +38,4 @@ public class ReceiveListener {
 
         //也可以在这里判断是否是某个服务的消息
     }
-
-    // @Header(name="contentType") Object header
-    // @Headers Map<String,Object> header
-
 }

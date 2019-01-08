@@ -32,7 +32,7 @@ public abstract class Servicer<T> implements Runnable {
 //    private MessageSendBacker sender;
 
     @Autowired
-    private MessageSendBacker sender;
+    private BackSender sender;
 
 //    @Autowired
 //    private Source sourceSender;
@@ -46,7 +46,7 @@ public abstract class Servicer<T> implements Runnable {
     public abstract String serviceName();
 
     protected void sendProcessedDataBack(RobotRecvMessage message) {
-        sender.sendData().send(MessageBuilder.withPayload(message).build());
+        sender.sendProcessedDataBack(message);
     }
 
 //    public Servicer(String servicer_name, MessageSendBacker sender) {

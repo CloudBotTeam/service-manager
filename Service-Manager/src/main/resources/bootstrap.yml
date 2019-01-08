@@ -4,4 +4,4 @@ spring:
     config:
       profile: dev
       label: master
-      uri: http://localhost:7001/ # config-server地址
+      uri: http://service-manager:7001/ # config-server地址

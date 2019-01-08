@@ -33,6 +33,7 @@ public class ServicerMap {
     @Autowired
     private ApplicationContext context;
 
+    // TODO: 考虑使用 注解实现
     @PostConstruct
     public void initMap() {
         servicerMap.put("echo", getServicerByName("echo"));

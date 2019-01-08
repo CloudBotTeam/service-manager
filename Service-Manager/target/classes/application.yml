@@ -5,7 +5,7 @@ eureka:
 
   client:
     service-url: # Eureka Server注册中心的地址, 用于Client与Server进行交流
-      defaultZone: http://localhost:8100/eureka/
+      defaultZone: http://service-discovery:8100/eureka/
 
 server:
   port: 8102
@@ -14,7 +14,7 @@ spring:
   application:
     name: service-manager #指定服务名
   rabbitmq:
-    host: localhost
+    host: rabbitmq
     port: 5672
     username: guest
     password: guest
@@ -25,6 +25,6 @@ spring:
           destination: bot-to-service
         output:
           destination: service-to-bot
-  redis:
-    host: 127.0.0.1
-    port: 6379
+#  redis:
+#    host: 127.0.0.1
+#    port: 6379

@@ -3,6 +3,7 @@ package cn.cloudbot.servicemanager.service;
 //import javafx.concurrent.Servicer;
 
 import cn.cloudbot.common.Message.BotMessage.RobotSendMessage;
+import cn.cloudbot.common.Message2.RobotSendMessage2;
 import cn.cloudbot.servicemanager.listener.BackSender;
 import cn.cloudbot.servicemanager.listener.MessageSendBacker;
 import cn.cloudbot.servicemanager.service.echo.EchoService;
@@ -37,21 +38,28 @@ public class ServiceManager {
         this.add_servicer("echo");
     }
 
-    private Map<String, Servicer<RobotSendMessage>> servicerMap = new ConcurrentHashMap<>();
+    private Map<String, Servicer<RobotSendMessage2>> servicerMap = new ConcurrentHashMap<>();
 
     /**
      * 向 这里 发送数据
      * 需要接受的会被接受
      * @param data
      */
-    public void async_send_data(RobotSendMessage data) {
-        for (Servicer<RobotSendMessage> servicer:
+    @Deprecated
+    public void async_send_data(RobotSendMessage2 data) {
+        for (Servicer<RobotSendMessage2> servicer:
                 servicerMap.values()) {
             if (servicer.if_accept(data)) {
                 servicer.async_send_data(data);
             }
 
         }
+    }
+
+    public void async_send_to_servicer2(RobotSendMessage2 data, String serviceName) {
+        Servicer servicer = servicerMap.get(serviceName);
+        servicer.async_send_data(data);
+
     }
 
 
@@ -65,7 +73,7 @@ public class ServiceManager {
     void add_servicer(String service_name) {
 
         @SuppressWarnings("unchecked")
-        Servicer<RobotSendMessage> servicer = (Servicer<RobotSendMessage>) context.getBean(service_name);
+        Servicer<RobotSendMessage2> servicer = (Servicer<RobotSendMessage2>) context.getBean(service_name);
 
         if (servicer == null) {
             throw new RuntimeException("Add Servicer is wrong");
