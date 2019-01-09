@@ -2,7 +2,7 @@ package cn.cloudbot.servicemanager;
 
 import cn.cloudbot.servicemanager.listener.BackSender;
 import cn.cloudbot.servicemanager.listener.MessageSendBacker;
-import cn.cloudbot.servicemanager.listener.Sink;
+import cn.cloudbot.servicemanager.listener.MessageSendBacker2;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,7 +14,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@EnableBinding(value = {Sink.class, MessageSendBacker.class})
+@EnableBinding(value = {MessageSendBacker.class, MessageSendBacker2.class})
 //@EnableAutoConfiguration
 //@ComponentScan
 public class ServiceManagerApplication {

@@ -4,8 +4,8 @@ import org.springframework.cloud.stream.annotation.Input;
 import org.springframework.messaging.SubscribableChannel;
 
 public interface MessageListener2 {
-    String INPUT = "BotManagerMessage2";
+    String INPUT = "BotMessage2";
 
-    @Input(Sink.INPUT)
+    @Input(MessageListener2.INPUT)
     SubscribableChannel input();
 }

@@ -1,6 +1,8 @@
 package cn.cloudbot.servicemanager.service;
 import cn.cloudbot.common.Message.ServiceMessage.RobotRecvMessage;
 
+import cn.cloudbot.common.Message2.RobotRecvMessage2;
+import cn.cloudbot.common.Message2.RobotSendMessage2;
 import cn.cloudbot.servicemanager.listener.BackSender;
 import cn.cloudbot.servicemanager.listener.MessageSendBacker;
 import cn.cloudbot.servicemanager.service.rss.pojo.ServicePOJO;
@@ -34,6 +36,7 @@ public abstract class Servicer<T> implements Runnable {
     @Autowired
     private BackSender sender;
 
+
 //    @Autowired
 //    private Source sourceSender;
 
@@ -49,9 +52,31 @@ public abstract class Servicer<T> implements Runnable {
         sender.sendProcessedDataBack(message);
     }
 
+    protected void sendProcessedDataSingle(RobotRecvMessage2 sendMessage2) {
+        sendMessage2.setFrom_service(this.serviceName());
+        sendMessage2.setType("return");
+        sender.sendProcessedDataBack2(sendMessage2);
+    }
 
     protected void sendBroadcast(String message) {
         logger.info("send broadcast " + message);
+        RobotRecvMessage2 message2 = new RobotRecvMessage2();
+        message2.setMessage(message);
+        message2.setType("all");
+        message2.setFrom_service(this.serviceName());
+        sender.sendProcessedDataBack2(message2);
+
+    }
+
+    protected void sendProcessedDataSingle(RobotRecvMessage message1, RobotSendMessage2 sendMessage2) {
+        RobotRecvMessage2 realMessage = new RobotRecvMessage2();
+        realMessage.setType("return");
+        realMessage.setGroup_id(message1.getGroup_id());
+        realMessage.setFrom_service(this.serviceName());
+        realMessage.setMessage(message1.getMessage());
+        realMessage.setRobot_ip(sendMessage2.getRobotIp());
+
+        sender.sendProcessedDataBack2(realMessage);
     }
 //    public Servicer(String servicer_name, MessageSendBacker sender) {
 //

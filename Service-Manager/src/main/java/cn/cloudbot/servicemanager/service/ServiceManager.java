@@ -36,6 +36,7 @@ public class ServiceManager {
     public void setEchoTest() {
 
         this.add_servicer("echo");
+        this.add_servicer("anitamashii");
     }
 
     private Map<String, Servicer<RobotSendMessage2>> servicerMap = new ConcurrentHashMap<>();

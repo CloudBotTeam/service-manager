@@ -4,15 +4,17 @@ import cn.cloudbot.common.Message.BotMessage.RobotSendMessage;
 import cn.cloudbot.common.Message2.RobotSendMessage2;
 import cn.cloudbot.servicemanager.service.ServiceManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
 
 import java.util.logging.Logger;
 
+@EnableBinding(MessageListener2.class)
 public class ReceiveListener2 {
     @Autowired
     private ServiceManager serviceManager;
 
-    private Logger logger = Logger.getLogger(ReceiveListener.class.getName());
+    private Logger logger = Logger.getLogger(ReceiveListener2.class.getName());
 
     @StreamListener(MessageListener2.INPUT)
     //？参数不用 Message message 是可以的吗？
@@ -22,6 +24,7 @@ public class ReceiveListener2 {
 
         for (String serv_name:
              receiveMessage.getServices()) {
+//            logger.info("Recv");
             logger.info("Send data " + receiveMessage + " to service " + serv_name);
             serviceManager.async_send_to_servicer2(receiveMessage, serv_name);
         }
