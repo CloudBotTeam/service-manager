@@ -33,7 +33,7 @@ public class ServiceManager {
     }
 
     @PostConstruct
-    public void setEchoTest() {
+    public void setAll() {
 
         this.add_servicer("echo");
         this.add_servicer("anitamashii");

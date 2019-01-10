@@ -44,6 +44,7 @@ public class EchoService extends Servicer<RobotSendMessage2>{
     public void running_logic() throws InterruptedException {
         while (true) {
             RobotSendMessage2 data = this.get_data();
+//            sendBroadcast("broadcast test");
             logger.info("Get data " + data);
             RobotRecvMessage2 message2 = new RobotRecvMessage2();
             message2.setRobot_ip(data.getRobotIp());
@@ -65,6 +66,12 @@ public class EchoService extends Servicer<RobotSendMessage2>{
             message2.setMessage(currentString);
             message2.setGroup_id(data.getRobotSendMessage().getGroup_id());
             sendProcessedDataSingle(message2);
+
+//            try {
+//                sendBroadcast("broadcast test");
+//            } catch (RuntimeException e) {
+//                continue;
+//            }
         }
     }
 }
