@@ -68,11 +68,16 @@ public abstract class Servicer<T> implements Runnable {
 
     }
 
+    /**
+     *
+     * @param message1 想要发送的消息
+     * @param sendMessage2 Robot 发送过来的消息
+     */
     protected void sendProcessedDataSingle(RobotRecvMessage message1, RobotSendMessage2 sendMessage2) {
         RobotRecvMessage2 realMessage = new RobotRecvMessage2();
         realMessage.setType("return");
-        realMessage.setGroup_id(message1.getGroup_id());
-        realMessage.setFrom_service(this.serviceName());
+        realMessage.setGroup_id(sendMessage2.getRobotSendMessage().getGroup_id());
+        realMessage.setFrom_service(serviceName());
         realMessage.setMessage(message1.getMessage());
         realMessage.setRobot_ip(sendMessage2.getRobotIp());
 

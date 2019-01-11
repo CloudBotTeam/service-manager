@@ -17,7 +17,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 //@JacksonXmlRootElement(localName = "item")
-public class ChannelItem implements Serializable {
+public class ChannelItem implements Comparable<ChannelItem>, Serializable{
 
     @JacksonXmlProperty(localName = "title")
     private String title;
@@ -31,4 +31,10 @@ public class ChannelItem implements Serializable {
 
     @JacksonXmlProperty(localName = "link")
     private String link;
+
+
+    @Override
+    public int compareTo(ChannelItem o) {
+        return this.pubDate.compareTo(o.pubDate);
+    }
 }

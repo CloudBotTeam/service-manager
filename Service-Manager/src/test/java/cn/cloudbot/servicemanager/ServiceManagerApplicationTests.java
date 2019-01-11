@@ -1,9 +1,8 @@
 package cn.cloudbot.servicemanager;
 
-import cn.cloudbot.servicemanager.service.rss.controller.ChannelController;
+import cn.cloudbot.servicemanager.service.rss.service.ChannelService;
 import cn.cloudbot.servicemanager.service.rss.pojo.ChannelItem;
 import cn.cloudbot.servicemanager.service.rss.pojo.Rss;
-import cn.cloudbot.servicemanager.service.rss.services.MovieService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,7 @@ import java.util.ArrayList;
 public class ServiceManagerApplicationTests {
 
     @Autowired
-    ChannelController channelController;
+    ChannelService channelController;
 
     @Test
     public void contextLoads() {

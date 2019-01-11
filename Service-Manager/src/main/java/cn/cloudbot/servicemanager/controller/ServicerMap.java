@@ -38,8 +38,8 @@ public class ServicerMap {
     public void initMap() {
         servicerMap.put("echo", getServicerByName("echo"));
         servicerMap.put("anitamashii", getServicerByName("anitamashii"));
-        servicerMap.put("weibo-lin", getServicerByName("weibo-lin"));
-        servicerMap.put("sse", getServicerByName("sse"));
+//        servicerMap.put("weibo-lin", getServicerByName("weibo-lin"));
+//        servicerMap.put("sse", getServicerByName("sse"));
     }
 
 

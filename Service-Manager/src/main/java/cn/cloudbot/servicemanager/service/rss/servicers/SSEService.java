@@ -1,10 +1,10 @@
-package cn.cloudbot.servicemanager.service.rss.services;
+package cn.cloudbot.servicemanager.service.rss.servicers;
 
 import cn.cloudbot.common.Message.BotMessage.RobotSendMessage;
 import cn.cloudbot.common.Message.BotMessage.RobotSendMessageSegment;
 import cn.cloudbot.common.Message.ServiceMessage.RobotRecvMessage;
 import cn.cloudbot.servicemanager.service.Servicer;
-import cn.cloudbot.servicemanager.service.rss.controller.ChannelController;
+import cn.cloudbot.servicemanager.service.rss.service.ChannelService;
 import cn.cloudbot.servicemanager.service.rss.pojo.Rss;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -21,7 +21,7 @@ public class SSEService extends Servicer<RobotSendMessage> {
     private static Logger logger = Logger.getLogger(SSEService.class.getName());
 
     @Autowired
-    private ChannelController channelController;
+    private ChannelService channelController;
 
     @Autowired
     private RedisTemplate redisTemplate;

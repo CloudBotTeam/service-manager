@@ -10,10 +10,12 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 
 
 @SpringBootApplication
 @EnableDiscoveryClient
+@EnableRedisRepositories
 @EnableBinding(value = {MessageSendBacker.class, MessageSendBacker2.class})
 //@EnableAutoConfiguration
 //@ComponentScan

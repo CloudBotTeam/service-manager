@@ -1,10 +1,10 @@
-package cn.cloudbot.servicemanager.service.rss.services;
+package cn.cloudbot.servicemanager.service.rss.servicers;
 
 import cn.cloudbot.common.Message.BotMessage.RobotSendMessage;
 import cn.cloudbot.common.Message.BotMessage.RobotSendMessageSegment;
 import cn.cloudbot.common.Message.ServiceMessage.RobotRecvMessage;
 import cn.cloudbot.servicemanager.service.Servicer;
-import cn.cloudbot.servicemanager.service.rss.controller.ChannelController;
+import cn.cloudbot.servicemanager.service.rss.service.ChannelService;
 import cn.cloudbot.servicemanager.service.rss.pojo.ChannelItem;
 import cn.cloudbot.servicemanager.service.rss.pojo.Rss;
 import lombok.Data;
@@ -21,12 +21,15 @@ import java.util.logging.Logger;
  **/
 
 @Data
-@Component("movie")
-public class MovieService extends Servicer<RobotSendMessage> {
-    private static Logger logger = Logger.getLogger(MovieService.class.getName());
+@Component("bangumi")
+public class BiliTodayService extends Servicer<RobotSendMessage> {
+    private static Logger logger = Logger.getLogger(BiliTodayService.class.getName());
 
     @Autowired
-    private ChannelController channelController;
+    private ChannelService channelController;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     private RobotSendMessage message;
 
@@ -34,22 +37,20 @@ public class MovieService extends Servicer<RobotSendMessage> {
 
     private RobotRecvMessage sendMsg;
 
-    // auto rss every day
-    public class AutoMovie implements Runnable {
+    // 每天
+    public class AutoBiliToday implements Runnable{
         @Override
         public void run() {
             while (true) {
-                logger.info("[request] movie requests");
-                Rss rss = channelController.getMovie();
+                logger.info("[request] bangumi requests");
+                Rss rss = channelController.getBiliToday();
                 StringBuilder hot = new StringBuilder();
                 ArrayList<ChannelItem> items = rss.getChannel().getItems();
-                for (int i = 0; i < 10; i++) {
+                for (int i = 0; i < items.size(); i++) {
                     hot.append(items.get(i).getTitle() + '\n');
                 }
-                hot.append("查看更多->https://movie.douban.com/cinema/nowplaying");
 //                sendMsg.setMessage(hot.toString());
-                logger.info("[send] movie service sent " + hot.toString());
-//                sendProcessedDataBack(sendMsg);
+                logger.info("[send] bangumi service sent " + hot.toString());
                 sendBroadcast(hot.toString());
                 try {
                     Thread.sleep(86400000);
@@ -60,10 +61,11 @@ public class MovieService extends Servicer<RobotSendMessage> {
         }
     }
 
+
     public Boolean isSentToMe() {
         // 默认第一段消息是命令
         this.receivedMsg =  this.message.getMessage();
-        if (this.receivedMsg[0].getData().getText().equals("电影")) {
+        if (this.receivedMsg[0].getData().getText().equals("放送")) {
             // 初始化要回复的消息
             this.sendMsg.setGroup_id(this.message.getGroup_id());
             this.sendMsg.setPlatform(this.message.getPlatform());
@@ -74,33 +76,32 @@ public class MovieService extends Servicer<RobotSendMessage> {
     }
 
     public void sendBack() {
-        Rss rss = channelController.getMovie();
+        Rss rss = channelController.getBiliToday();
         StringBuilder hot = new StringBuilder();
         ArrayList<ChannelItem> items = rss.getChannel().getItems();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < items.size(); i++) {
             hot.append(items.get(i).getTitle() + '\n');
         }
-        hot.append("查看更多->https://movie.douban.com/cinema/nowplaying");
         sendMsg.setMessage(hot.toString());
-        logger.info("[send] movie service sent " + sendMsg);
+        logger.info("[send] bangumi service sent " + sendMsg);
         sendProcessedDataBack(sendMsg);
     }
 
     @Override
     public String serviceName() {
-        return "movie";
+        return "bangumi";
     }
 
     @Override
     public boolean if_accept(RobotSendMessage data) {
-        // 每条都收
-        logger.info("[Accept] movie service accepted the message.");
-        return false;
+        // 每一条都收
+        logger.info("[Accept] bangumi service accepted the message.");
+        return true;
     }
 
     @Override
     public void running_logic() throws InterruptedException {
-        Thread autoRss = new Thread(new AutoMovie());
+        Thread autoRss = new Thread(new AutoBiliToday());
         autoRss.setDaemon(true);
         autoRss.start();
         while (true) {

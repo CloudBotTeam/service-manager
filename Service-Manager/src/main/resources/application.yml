@@ -25,6 +25,6 @@ spring:
           destination: bot-to-service
         output:
           destination: service-to-bot
-#  redis:
-#    host: 127.0.0.1
-#    port: 6379
+  redis:
+    host: service-manager-redis
+    port: 6379

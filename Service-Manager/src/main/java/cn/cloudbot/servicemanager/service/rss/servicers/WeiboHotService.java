@@ -1,10 +1,10 @@
-package cn.cloudbot.servicemanager.service.rss.services;
+package cn.cloudbot.servicemanager.service.rss.servicers;
 
 import cn.cloudbot.common.Message.BotMessage.RobotSendMessage;
 import cn.cloudbot.common.Message.BotMessage.RobotSendMessageSegment;
 import cn.cloudbot.common.Message.ServiceMessage.RobotRecvMessage;
 import cn.cloudbot.servicemanager.service.Servicer;
-import cn.cloudbot.servicemanager.service.rss.controller.ChannelController;
+import cn.cloudbot.servicemanager.service.rss.service.ChannelService;
 import cn.cloudbot.servicemanager.service.rss.pojo.ChannelItem;
 import cn.cloudbot.servicemanager.service.rss.pojo.Rss;
 import lombok.Data;
@@ -21,12 +21,12 @@ import java.util.logging.Logger;
  **/
 
 @Data
-@Component("juejin")
-public class JuejinService extends Servicer<RobotSendMessage> {
-    private static Logger logger = Logger.getLogger(JuejinService.class.getName());
+@Component("hot")
+public class WeiboHotService extends Servicer<RobotSendMessage> {
+    private static Logger logger = Logger.getLogger(WeiboService.class.getName());
 
     @Autowired
-    private ChannelController channelController;
+    private ChannelService channelController;
 
     @Autowired
     private RedisTemplate redisTemplate;
@@ -37,64 +37,42 @@ public class JuejinService extends Servicer<RobotSendMessage> {
 
     private RobotRecvMessage sendMsg;
 
-    private String type;
-
     public Boolean isSentToMe() {
         // 默认第一段消息是命令
         this.receivedMsg =  this.message.getMessage();
-        String cmd = this.receivedMsg[0].getData().getText();
-        if (cmd.equals("掘金前端")) {
-            this.type = "frontend";
-            return true;
-        }
-        else if (cmd.equals("掘金安卓")) {
-            this.type = "android";
-            return true;
-        }
-        else if (cmd.equals("掘金苹果")) {
-            this.type = "iOS";
-            return true;
-        }
-        else if (cmd.equals("掘金设计")) {
-            this.type = "design";
-            return true;
-        }
-        else if (cmd.equals("掘金后端")) {
-            this.type = "backend";
+        if (this.receivedMsg[0].getData().getText().equals("热搜")) {
+            // 初始化要回复的消息
+            this.sendMsg.setGroup_id(this.message.getGroup_id());
+            this.sendMsg.setPlatform(this.message.getPlatform());
+            this.sendMsg.setMessage(this.message.getMessage()[0].getData().getText());
             return true;
         }
         return false;
     }
 
     public void sendBack() {
-        // 初始化要回复的消息
-        this.sendMsg.setGroup_id(this.message.getGroup_id());
-        this.sendMsg.setPlatform(this.message.getPlatform());
-        this.sendMsg.setMessage(this.message.getMessage()[0].getData().getText());
-        // 获取 rss
-        Rss rss = channelController.getJuejinByType(type);
+        Rss rss = channelController.getWeiboHot();
         StringBuilder hot = new StringBuilder();
         ArrayList<ChannelItem> items = rss.getChannel().getItems();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 10; i++) {
             hot.append(items.get(i).getTitle() + '\n');
         }
-        hot.append("查看更多->https://juejin.im/welcome/" + type);
+        hot.append("查看更多->https://s.weibo.com/top/summary?cate=realtimehot");
         sendMsg.setMessage(hot.toString());
-        logger.info("[send] juejin service sent " + sendMsg);
+        logger.info("[send] hot service sent " + sendMsg);
         sendProcessedDataBack(sendMsg);
     }
 
 
     @Override
     public String serviceName() {
-        return "juejin";
+        return "hot";
     }
 
     @Override
     public boolean if_accept(RobotSendMessage data) {
-        // 每一条都收
-        logger.info("[Accept] juejin service accepted the message.");
-        return false;
+        logger.info("[Accept] hot service accepted the message.");
+        return true;
     }
 
     @Override

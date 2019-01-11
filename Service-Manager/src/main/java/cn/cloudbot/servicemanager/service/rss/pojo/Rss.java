@@ -16,8 +16,13 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @JacksonXmlRootElement(localName = "rss")
-public class Rss implements Serializable {
+public class Rss implements Serializable, Comparable<Rss>{
 
     @JacksonXmlProperty(localName = "channel")
     private Channel channel;
+
+    @Override
+    public int compareTo(Rss o) {
+        return this.channel.compareTo(o.channel);
+    }
 }

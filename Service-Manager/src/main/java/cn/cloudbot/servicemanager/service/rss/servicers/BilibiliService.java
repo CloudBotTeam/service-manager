@@ -1,16 +1,21 @@
-package cn.cloudbot.servicemanager.service.rss.services;
+package cn.cloudbot.servicemanager.service.rss.servicers;
 
+import cn.cloudbot.common.Message.BotMessage.MessageSegmentType;
 import cn.cloudbot.common.Message.BotMessage.RobotSendMessage;
 import cn.cloudbot.common.Message.BotMessage.RobotSendMessageSegment;
 import cn.cloudbot.common.Message.ServiceMessage.RobotRecvMessage;
+import cn.cloudbot.common.Message2.RobotRecvMessage2;
 import cn.cloudbot.common.Message2.RobotSendMessage2;
 import cn.cloudbot.servicemanager.service.Servicer;
-import cn.cloudbot.servicemanager.service.rss.controller.ChannelController;
+import cn.cloudbot.servicemanager.service.rss.service.ChannelService;
 import cn.cloudbot.servicemanager.service.rss.pojo.Rss;
+import cn.cloudbot.servicemanager.service.rss.service.RedisRssService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Logger;
 
 /**
@@ -22,10 +27,10 @@ public class BilibiliService extends Servicer<RobotSendMessage2> {
     private static Logger logger = Logger.getLogger(BilibiliService.class.getName());
 
     @Autowired
-    private ChannelController channelController;
+    private ChannelService channelController;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private RedisRssService redisRssService;
 
     private RobotSendMessage message;
 
@@ -33,35 +38,21 @@ public class BilibiliService extends Servicer<RobotSendMessage2> {
 
     private RobotRecvMessage sendMsg;
 
-    // 自动推送子线程
-    // 每 30s 请求一次
-    public class AutoBilibili implements Runnable{
-        @Override
-        public void run() {
-            while (true) {
-                logger.info("[request] anitamashii requests");
-                Rss rss = channelController.getBiliToday();
-                Rss redisRss = (Rss) redisTemplate.opsForValue().get("anitamashii");
-                if (redisRss == null) {
-                    redisTemplate.opsForValue().set("anitamashii", rss);
-                }
-                else {
-                    if (rss.getChannel().getItems().get(0).getPubDate() == redisRss.getChannel().getItems().get(0).getPubDate()) {
-                        logger.info("No new anitamashii video update.");
-                    }
-                    else {
-                        redisTemplate.opsForValue().set("anitamashii", rss);
-
-                        String broadcastMsg = "AnimeTamashii发新视频啦：" + rss.getChannel().getItems().get(0).getTitle() +
-                                "\n点击查看->" + rss.getChannel().getItems().get(0).getLink();
-                        sendBroadcast(broadcastMsg);
-                    }
-                }
-                try {
-                    Thread.sleep(30000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+    public void timer_run() throws InterruptedException {
+        logger.info("[request] anitamashii requests");
+        Rss rss = channelController.getBiliToday();
+        Rss redisRss = redisRssService.getRssByField(serviceName());
+        if (redisRss == null) {
+            redisRssService.setRssWithField(serviceName(), rss);
+        }
+        else {
+            if(rss.equals(redisRss)) {
+                // data cached in redis is not out date
+                return;
+            } else {
+                // update cache
+                redisRssService.setRssWithField(serviceName(), rss);
+                sendBroadcast(rss.getChannel().getItems().toString());
             }
         }
     }
@@ -107,11 +98,11 @@ public class BilibiliService extends Servicer<RobotSendMessage2> {
         boolean name_called = false;
         for (RobotSendMessageSegment segment:
              data.getRobotSendMessage().getMessage()) {
-            if (segment.getType().equals("at")) {
+            if (segment.getType().equals(MessageSegmentType.AT)) {
                 ated = true;
             }
 
-            if (segment.getType().equals("text") && segment.getData().getText().contains(serviceName())) {
+            if (segment.getType().equals(MessageSegmentType.TEXT) && segment.getData().getText().contains(serviceName())) {
                 name_called = true;
             }
         }
@@ -124,16 +115,30 @@ public class BilibiliService extends Servicer<RobotSendMessage2> {
     @Override
     public void running_logic() throws InterruptedException {
         // 自动推送子线程
-        Thread autoRss = new Thread(new AutoBilibili());
-        autoRss.setDaemon(true);
-        autoRss.start();
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run(){
+                try {
+                    logger.info("Timer TTask called.");
+                    timer_run();
+                } catch (InterruptedException e) {
+                    logger.info("Timer meets interupts");
+                }
+
+            }
+        }, 10000, 60000);
+
         while (true) {
             RobotSendMessage2 message2 = this.get_data();
             this.message = message2.getRobotSendMessage(); // 阻塞直到收到消息
-            if (isSentToMe()) {
-                logger.info("[Service] anitamashii service replied.");
-                sendBack(message2);
-            }
+
+            Rss rss = redisRssService.getRssByField(serviceName());
+            RobotRecvMessage robotRecvMessage = new RobotRecvMessage();
+
+            robotRecvMessage.setMessage(rss.toString());
+
+
+            sendProcessedDataSingle(robotRecvMessage, message2);
         }
     }
 }

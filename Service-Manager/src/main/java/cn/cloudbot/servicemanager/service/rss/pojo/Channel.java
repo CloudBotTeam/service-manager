@@ -20,7 +20,7 @@ import java.util.ArrayList;
 @NoArgsConstructor
 @AllArgsConstructor
 @JacksonXmlRootElement(localName = "channel")
-public class Channel implements Serializable {
+public class Channel implements Serializable, Comparable<Channel> {
 
     //JacksonXmlProperty用法见 https://www.jianshu.com/p/b6b9f8ed8cb7
 
@@ -31,4 +31,8 @@ public class Channel implements Serializable {
     @JacksonXmlProperty(localName = "item")
     private ArrayList<ChannelItem> items;
 
+    @Override
+    public int compareTo(Channel o) {
+        return this.items.get(0).compareTo(o.items.get(0));
+    }
 }
