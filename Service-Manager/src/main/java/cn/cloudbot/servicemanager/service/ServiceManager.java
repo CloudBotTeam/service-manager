@@ -37,6 +37,11 @@ public class ServiceManager {
 
         this.add_servicer("echo");
         this.add_servicer("anitamashii");
+        this.add_servicer("bangumi");
+        this.add_servicer("movie");
+        this.add_servicer("sse");
+        this.add_servicer("hot");
+
     }
 
     private Map<String, Servicer<RobotSendMessage2>> servicerMap = new ConcurrentHashMap<>();

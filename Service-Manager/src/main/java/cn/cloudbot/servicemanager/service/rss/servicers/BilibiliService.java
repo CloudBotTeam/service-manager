@@ -34,10 +34,6 @@ public class BilibiliService extends Servicer<RobotSendMessage2> {
 
     private RobotSendMessage message;
 
-    private RobotSendMessageSegment[] receivedMsg;
-
-    private RobotRecvMessage sendMsg;
-
     public void timer_run() throws InterruptedException {
         logger.info("[request] anitamashii requests");
         Rss rss = channelController.getBiliToday();
@@ -55,34 +51,6 @@ public class BilibiliService extends Servicer<RobotSendMessage2> {
                 sendBroadcast(rss.getChannel().getItems().toString());
             }
         }
-    }
-
-    public void initSendMsg() {
-        // 初始化要回复的消息
-        this.sendMsg.setGroup_id(this.message.getGroup_id());
-        this.sendMsg.setPlatform(this.message.getPlatform());
-        this.sendMsg.setMessage(this.message.getMessage()[0].getData().getText());
-    }
-
-    public Boolean isSentToMe() {
-        // 默认第一段消息是命令
-//        this.receivedMsg =  this.message.getMessage();
-//        if (this.receivedMsg[0].getData().getText().equals("哔哩哔哩")) {
-//            initSendMsg();
-//            return true;
-//        }
-//        return false;
-        return true;
-    }
-
-    public void sendBack(RobotSendMessage2 sendMessage2) {
-        Rss rss = channelController.getBilibiliByUserId("11357018");
-        sendMsg.setMessage("AnimeTamashii最新视频："+ rss.getChannel().getItems().get(0).getTitle() +
-                "\n点击查看详情->" + rss.getChannel().getItems().get(0).getLink());
-
-        logger.info("[send] anitamashii service sent " + sendMsg);
-        sendProcessedDataSingle(sendMsg, sendMessage2);
-//        sendProcessedDataBack(sendMsg);
     }
 
     @Override
@@ -133,10 +101,11 @@ public class BilibiliService extends Servicer<RobotSendMessage2> {
             this.message = message2.getRobotSendMessage(); // 阻塞直到收到消息
 
             Rss rss = redisRssService.getRssByField(serviceName());
+
             RobotRecvMessage robotRecvMessage = new RobotRecvMessage();
 
-            robotRecvMessage.setMessage(rss.toString());
-
+            robotRecvMessage.setMessage("AnimeTamashii最新视频："+ rss.getChannel().getItems().get(0).getTitle() +
+                    "\n点击查看详情->" + rss.getChannel().getItems().get(0).getLink());
 
             sendProcessedDataSingle(robotRecvMessage, message2);
         }

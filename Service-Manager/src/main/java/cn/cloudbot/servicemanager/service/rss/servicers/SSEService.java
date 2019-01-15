@@ -1,15 +1,22 @@
 package cn.cloudbot.servicemanager.service.rss.servicers;
 
+import cn.cloudbot.common.Message.BotMessage.MessageSegmentType;
 import cn.cloudbot.common.Message.BotMessage.RobotSendMessage;
 import cn.cloudbot.common.Message.BotMessage.RobotSendMessageSegment;
 import cn.cloudbot.common.Message.ServiceMessage.RobotRecvMessage;
+import cn.cloudbot.common.Message2.RobotSendMessage2;
 import cn.cloudbot.servicemanager.service.Servicer;
+import cn.cloudbot.servicemanager.service.rss.pojo.ChannelItem;
 import cn.cloudbot.servicemanager.service.rss.service.ChannelService;
 import cn.cloudbot.servicemanager.service.rss.pojo.Rss;
+import cn.cloudbot.servicemanager.service.rss.service.RedisRssService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Logger;
 
 /**
@@ -17,73 +24,33 @@ import java.util.logging.Logger;
  * @since: 2019-01-02
  **/
 @Component("sse")
-public class SSEService extends Servicer<RobotSendMessage> {
-    private static Logger logger = Logger.getLogger(SSEService.class.getName());
+public class SSEService extends Servicer<RobotSendMessage2> {
 
     @Autowired
     private ChannelService channelController;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private RedisRssService redisRssService;
 
     private RobotSendMessage message;
 
-    private RobotSendMessageSegment[] receivedMsg;
-
-    private RobotRecvMessage sendMsg;
-
-    // every hour
-    public class AutoSSE implements Runnable {
-        @Override
-        public void run() {
-            while (true) {
-                logger.info("[request] sse requests");
-                Rss rss = channelController.getTJUSSExwdt();
-                Rss redisRss = (Rss) redisTemplate.opsForValue().get("sse");
-                if (redisRss == null) {
-                    redisTemplate.opsForValue().set("sse", rss);
-                }
-                else {
-                    if (rss.getChannel().getItems().get(0).getPubDate() == redisRss.getChannel().getItems().get(0).getPubDate()) {
-                        logger.info("No sse update.");
-                    }
-                    else {
-                        redisTemplate.opsForValue().set("sse", rss);
-                        String broadcastMsg = "学院官网有新通知啦：" + rss.getChannel().getItems().get(0).getTitle() +
-                                "\n点击查看->" + rss.getChannel().getItems().get(0).getLink();
-                        sendBroadcast(broadcastMsg);
-                    }
-                }
-                try {
-                    Thread.sleep(3600000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+    public void timer_run() throws InterruptedException {
+        Rss rss = channelController.getTJUSSExwdt();
+        Rss redisRss = redisRssService.getRssByField(serviceName());
+        if (redisRss == null) {
+            redisRssService.setRssWithField(serviceName(), rss);
+        }
+        else {
+            if(rss.equals(redisRss)) {
+                // data cached in redis is not out date
+                return;
+            } else {
+                // update cache
+                redisRssService.setRssWithField(serviceName(), rss);
+                sendBroadcast(rss.getChannel().getItems().toString());
             }
         }
     }
-
-    public Boolean isSentToMe() {
-        // 默认第一段消息是命令
-        this.receivedMsg =  this.message.getMessage();
-        if (this.receivedMsg[0].getData().getText().equals("软院通知")) {
-            // 初始化要回复的消息
-            this.sendMsg.setGroup_id(this.message.getGroup_id());
-            this.sendMsg.setPlatform(this.message.getPlatform());
-            this.sendMsg.setMessage(this.message.getMessage()[0].getData().getText());
-            return true;
-        }
-        return false;
-    }
-
-    public void sendBack() {
-        Rss rss = channelController.getTJUSSExwdt();
-        sendMsg.setMessage("学院网最新通知："+ rss.getChannel().getItems().get(0).getTitle() +
-                "\n点击查看详情->" + rss.getChannel().getItems().get(0).getLink());
-        logger.info("[send] sse service sent " + sendMsg);
-        sendProcessedDataBack(sendMsg);
-    }
-
 
     @Override
     public String serviceName() {
@@ -91,22 +58,53 @@ public class SSEService extends Servicer<RobotSendMessage> {
     }
 
     @Override
-    public boolean if_accept(RobotSendMessage data) {
-        // 每条都收
-        logger.info("[Accept] sse service accepted the message.");
-        return true;
+    public boolean if_accept(RobotSendMessage2 data) {
+        // 是否被AT
+
+        boolean ated = false;
+        boolean name_called = false;
+        for (RobotSendMessageSegment segment:
+                data.getRobotSendMessage().getMessage()) {
+            if (segment.getType().equals(MessageSegmentType.AT)) {
+                ated = true;
+            }
+
+            if (segment.getType().equals(MessageSegmentType.TEXT) && segment.getData().getText().contains(serviceName())) {
+                name_called = true;
+            }
+        }
+        return ated && name_called;
+
     }
+
 
     @Override
     public void running_logic() throws InterruptedException {
-        Thread autoRss = new Thread(new AutoSSE());
-        autoRss.setDaemon(true);
-        autoRss.start();
-        while (true) {
-            this.message = this.get_data();
-            if (isSentToMe()) {
-                sendBack();
+        // 自动推送子线程
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run(){
+                try {
+                    timer_run();
+                } catch (InterruptedException e) {
+                }
+
             }
+        }, 10000, 60000);
+
+        while (true) {
+            RobotSendMessage2 message2 = this.get_data();
+            this.message = message2.getRobotSendMessage(); // 阻塞直到收到消息
+
+            Rss rss = redisRssService.getRssByField(serviceName());
+
+            RobotRecvMessage robotRecvMessage = new RobotRecvMessage();
+
+            robotRecvMessage.setMessage("学院网最新通知："+ rss.getChannel().getItems().get(0).getTitle() +
+                    "\n点击查看详情->" + rss.getChannel().getItems().get(0).getLink());
+
+            sendProcessedDataSingle(robotRecvMessage, message2);
         }
     }
+
 }
