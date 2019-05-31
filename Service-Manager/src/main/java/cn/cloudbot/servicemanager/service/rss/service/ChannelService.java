@@ -17,7 +17,8 @@ public class ChannelService {
     @Autowired
     private RestTemplate restTemplate;
 
-    String route = "http://maplewish.cn:1200";
+//    String route = "http://maplewish.cn:1200";
+    String route = "http://srszd.top:1200";
 
     /**
      * 获取软件学院实时通知（新闻动态
