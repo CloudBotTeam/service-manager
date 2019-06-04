@@ -86,6 +86,13 @@ public class ChannelService {
         return rss;
     }
 
-
-
+    /**
+     * 获取某公众号最新推送（按公众号 ID）
+     * @param uid
+     * @return Rss(json)
+     */
+    public Rss getWechatById(String uid) {
+        Rss rss = restTemplate.getForObject(route + "/wechat/wasi/" + uid, Rss.class);
+        return rss;
+    }
 }
