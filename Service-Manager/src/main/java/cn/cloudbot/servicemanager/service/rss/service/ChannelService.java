@@ -95,4 +95,13 @@ public class ChannelService {
         Rss rss = restTemplate.getForObject(route + "/wechat/wasi/" + uid, Rss.class);
         return rss;
     }
+
+    /**
+     * 根据央视最新新闻
+     */
+    public Rss getNews() {
+        Rss rss = restTemplate.getForObject(route + "/cctv/world", Rss.class);
+
+        return rss;
+    }
 }
