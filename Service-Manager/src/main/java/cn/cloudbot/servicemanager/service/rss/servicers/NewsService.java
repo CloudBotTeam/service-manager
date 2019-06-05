@@ -28,7 +28,7 @@ import java.util.logging.Logger;
 @Data
 @Component("news")
 public class NewsService extends Servicer<RobotSendMessage2> {
-    private static Logger logger = Logger.getLogger(MovieService.class.getName());
+    private static Logger logger = Logger.getLogger(NewsService.class.getName());
 
     @Autowired
     private ChannelService channelController;
