@@ -63,19 +63,20 @@ public class WeiboHotService extends Servicer<RobotSendMessage2> {
     public boolean if_accept(RobotSendMessage2 data) {
         // 是否被AT
 
-        boolean ated = false;
+//        boolean ated = false;
         boolean name_called = false;
         for (RobotSendMessageSegment segment:
                 data.getRobotSendMessage().getMessage()) {
-            if (segment.getType().equals(MessageSegmentType.AT)) {
-                ated = true;
-            }
+//            if (segment.getType().equals(MessageSegmentType.AT)) {
+//                ated = true;
+//            }
 
-            if (segment.getType().equals(MessageSegmentType.TEXT) && segment.getData().getText().contains(serviceName())) {
+            if (segment.getType().equals(MessageSegmentType.TEXT) )
+                if (segment.getData().getText().contains("热搜")) {
                 name_called = true;
             }
         }
-        return ated && name_called;
+        return name_called;
 
     }
 
