@@ -1,112 +1,3 @@
-//package cn.cloudbot.servicemanager.service.rss.servicers;
-//
-//import cn.cloudbot.common.Message.BotMessage.RobotSendMessage;
-//import cn.cloudbot.common.Message.BotMessage.RobotSendMessageSegment;
-//import cn.cloudbot.common.Message.ServiceMessage.RobotRecvMessage;
-//import cn.cloudbot.servicemanager.service.Servicer;
-//import cn.cloudbot.servicemanager.service.rss.pojo.ChannelItem;
-//import cn.cloudbot.servicemanager.service.rss.service.ChannelService;
-//import cn.cloudbot.servicemanager.service.rss.pojo.Rss;
-//import lombok.Data;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.data.redis.core.RedisTemplate;
-//import org.springframework.stereotype.Component;
-//
-//import java.util.ArrayList;
-//import java.util.logging.Logger;
-//
-//import java.util.HashMap;
-//
-//
-//@Data
-//@Component("wechat")
-//public class WechatService extends Servicer<RobotSendMessage> {
-//
-//    private static Logger logger = Logger.getLogger(WechatService.class.getName());
-//
-//    @Autowired
-//    private ChannelService channelController;
-//
-//    @Autowired
-//    private RedisTemplate redisTemplate;
-//
-//    private RobotSendMessage message;
-//
-//    private RobotSendMessageSegment[] receivedMsg;
-//
-//    private RobotRecvMessage sendMsg;
-//
-//    // 公众号名称
-//    private String account_name;
-//
-//    // 公众号及对应的 ID
-//    private HashMap<String, String> accountID = new HashMap<>();
-//
-//
-//    public Boolean isSentToMe() {
-//
-//        // 默认第一段消息是命令
-//        this.receivedMsg =  this.message.getMessage();
-//        String cmd = this.receivedMsg[0].getData().getText();
-//        // 输入格式示例：wechat 机器之心
-//        if (cmd.substring(0, 6).equals("wechat")) {
-//            this.account_name = cmd.substring(7);
-//            return true;
-//        }
-//        return false;
-//    }
-//
-//    public void sendBack() {
-//        // 初始化要回复的消息
-//        this.sendMsg.setGroup_id(this.message.getGroup_id());
-//        this.sendMsg.setPlatform(this.message.getPlatform());
-//        this.sendMsg.setMessage(this.message.getMessage()[0].getData().getText());
-//
-//        // 获取 rss
-//        Rss rss = channelController.getWechatById(accountID.get(account_name));
-//
-//        StringBuilder articles = new StringBuilder();
-//        articles.append(account_name + "公众号的最新三篇推送：\n");
-//        ArrayList<ChannelItem> items = rss.getChannel().getItems();
-//        for (int i = 0; i < 3; i++) {
-//            articles.append(items.get(i).getTitle() + '\n');
-//            articles.append("阅读这篇文章-> " + items.get(i).getLink() + '\n');
-//        }
-//
-//        sendMsg.setMessage(articles.toString());
-//        logger.info("[send] wechat service sent " + sendMsg);
-//        sendProcessedDataBack(sendMsg);
-//    }
-//
-//
-//    @Override
-//    public String serviceName() {
-//        return "wechat";
-//    }
-//
-//    @Override
-//    public boolean if_accept(RobotSendMessage data) {
-//        // 每一条都收
-//        logger.info("[Accept] wechat service accepted the message.");
-//        return false;
-//    }
-//
-//
-//    @Override
-//    public void running_logic() throws InterruptedException {
-//
-//        this.accountID.put("同济大学", "5c276fa3497ff40f7fe4b81d");
-//        this.accountID.put("机器之心", "5b575dd058e5c4583338dbd3");
-//
-//        while (true) {
-//            this.message = this.get_data();
-//            if (isSentToMe()) {
-//                sendBack();
-//            }
-//        }
-//    }
-//}
-
 package cn.cloudbot.servicemanager.service.rss.servicers;
 
 import cn.cloudbot.common.Message.BotMessage.MessageSegmentType;
@@ -124,10 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 
+import java.util.Scanner;
 
 @Data
 @Component("wechat")
@@ -157,39 +47,80 @@ public class WechatService extends Servicer<RobotSendMessage2> {
     public boolean if_accept(RobotSendMessage2 data) {
         // 是否被AT
 
-        boolean ated = false;
+        //boolean ated = false;
         boolean name_called = false;
         for (RobotSendMessageSegment segment:
                 data.getRobotSendMessage().getMessage()) {
-            if (segment.getType().equals(MessageSegmentType.AT)) {
-                ated = true;
-            }
+//            if (segment.getType().equals(MessageSegmentType.AT)) {
+//                ated = true;
+//            }
 
-            if (segment.getType().equals(MessageSegmentType.TEXT) && segment.getData().getText().contains(serviceName())) {
-                name_called = true;
+//            if (segment.getType().equals(MessageSegmentType.TEXT) && segment.getData().getText().contains(serviceName())) {
+//                name_called = true;
+//
+//                Iterator iter = accountID.keySet().iterator();
+//                while (iter.hasNext()) {
+//                    String name = iter.next().toString();
+//
+//                    if(segment.getData().getText().contains(name)){
+//                        this.account_name = name;
+//                        break;
+//                    }
+//                }
+//            }
 
-                Iterator iter = accountID.keySet().iterator();
-                while (iter.hasNext()) {
-                    String name = iter.next().toString();
+            if (segment.getType().equals(MessageSegmentType.TEXT)) {
 
-                    if(segment.getData().getText().contains(name)){
-                        this.account_name = name;
-                        break;
+                if(segment.getData().getText().contains("公众号") ||
+                        segment.getData().getText().contains("推送") ||
+                        segment.getData().getText().contains("漫画") ||
+                        segment.getData().getText().contains("文章")) {
+
+                    Iterator iter = accountID.keySet().iterator();
+                    while (iter.hasNext()) {
+                        String name = iter.next().toString();
+
+                        if(segment.getData().getText().contains(name)){
+                            name_called = true;
+                            this.account_name = name;
+                            break;
+                        }
                     }
+
                 }
+
             }
         }
-        return ated && name_called;
-
+        return name_called;
     }
 
 
     @Override
     public void running_logic() throws InterruptedException {
 
-        this.accountID.put("同济大学", "5c276fa3497ff40f7fe4b81d");
-        this.accountID.put("机器之心", "5b575dd058e5c4583338dbd3");
+        accountID.put("同济大学", "5c276fa3497ff40f7fe4b81d");
+        accountID.put("机器之心", "5b575dd058e5c4583338dbd3");
+        accountID.put("非人哉", "5bc5447f244d4e7c65406486");
+        accountID.put("游戏时光", "5c5cea53497ff47ac121102c");
+        accountID.put("机核", "5b9e723a244d4e7878c5b438");
 
+        List<String> St = new ArrayList<>();
+        St.add("说到这个，");
+        St.add("既然你们在讨论这个，");
+        St.add("你们对这种东西感兴趣吗，那");
+        St.add("告诉你们一个秘密，");
+
+        List<String> Mid = new ArrayList<>();
+        Mid.add("我发现");
+        Mid.add("看起来");
+        Mid.add("听说");
+        Mid.add("你们知道吗，");
+
+        List<String> Ed = new ArrayList<>();
+        Ed.add("发新推送了：");
+        Ed.add("发了一些精彩的文章：");
+        Ed.add("活过来了：");
+        Ed.add("最近有了一些动作：");
 
         while (true) {
 
@@ -202,11 +133,17 @@ public class WechatService extends Servicer<RobotSendMessage2> {
 
 
             StringBuilder articles = new StringBuilder();
-            articles.append(account_name + "公众号的最新三篇推送：\n");
+
+
+            int StID = (int)(Math.random()*1000) % 4;
+            int MidID = (int)(Math.random()*1000) % 4;
+            int EdID = (int)(Math.random()*1000) % 4;
+
+            articles.append(St.get(StID) + Mid.get(MidID) + account_name + "公众号" + Ed.get(EdID) + "\n");
             ArrayList<ChannelItem> items = rss.getChannel().getItems();
             for (int i = 0; i < 3; i++) {
                 articles.append(items.get(i).getTitle() + '\n');
-                articles.append("阅读这篇文章-> " + items.get(i).getLink() + '\n');
+                articles.append("阅读这篇文章-> " + items.get(i).getLink() + '\n' + '\n');
             }
 
             robotRecvMessage.setMessage(articles.toString());
@@ -214,4 +151,9 @@ public class WechatService extends Servicer<RobotSendMessage2> {
             sendProcessedDataSingle(robotRecvMessage, message2);
         }
     }
+
+//    public static void main(String [] args) {
+//        WechatService test = new WechatService();
+//        test.running_logic();
+//    }
 }

@@ -104,4 +104,13 @@ public class ChannelService {
 
         return rss;
     }
+
+    /**
+     * 获取任天堂新发售的游戏
+     * @return Rss(json)
+     */
+    public Rss getEshop() {
+        Rss rss = restTemplate.getForObject(route + "/nintendo/eshop/hk", Rss.class);
+        return rss;
+    }
 }
