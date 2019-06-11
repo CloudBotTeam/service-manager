@@ -193,7 +193,7 @@ public class ChatService extends Servicer<RobotSendMessage2> {
                 robotRecvMessage.setMessage(responseMessage.toString());
 
                 sendProcessedDataSingle(robotRecvMessage, message2);
-                sendBroadcast(responseMessage.toString());
+//                sendBroadcast(responseMessage.toString());
             }
         }
     }

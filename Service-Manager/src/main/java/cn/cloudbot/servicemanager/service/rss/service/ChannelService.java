@@ -18,7 +18,7 @@ public class ChannelService {
     private RestTemplate restTemplate;
 
 //    String route = "http://maplewish.cn:1200";
-    String route = "http://118.25.157.149:1200";
+    String route = "http://srszd.top:1200";
 
     /**
      * 获取软件学院实时通知（新闻动态
@@ -74,7 +74,7 @@ public class ChannelService {
      * 获取正在上映的电影
      */
     public Rss getMovie() {
-        Rss rss = restTemplate.getForObject(route + "/douban/movie/playing", Rss.class);
+        Rss rss = restTemplate.getForObject(route + "/douban/movie/playing/7.5", Rss.class);
         return rss;
     }
 
