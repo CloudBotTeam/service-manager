@@ -41,7 +41,7 @@ public class ServiceManager {
         this.add_servicer("movie");
         this.add_servicer("sse");
         this.add_servicer("hot");
-//        this.add_servicer("chat");
+        this.add_servicer("chat");
         this.add_servicer("wechat");
         this.add_servicer("news");
 

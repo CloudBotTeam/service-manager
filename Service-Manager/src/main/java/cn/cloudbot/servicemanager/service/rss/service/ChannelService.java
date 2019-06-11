@@ -46,7 +46,7 @@ public class ChannelService {
      * @return
      */
     public Rss getWeiboHot() {
-        Rss rss = restTemplate.getForObject(route + "weibo/search/hot", Rss.class);
+        Rss rss = restTemplate.getForObject(route + "/weibo/search/hot", Rss.class);
         return rss;
     }
 
@@ -66,7 +66,7 @@ public class ChannelService {
      * @return
      */
     public Rss getJuejinByType(String type) {
-        Rss rss = restTemplate.getForObject(route + "juejin/category/" + type, Rss.class);
+        Rss rss = restTemplate.getForObject(route + "/juejin/category/" + type, Rss.class);
         return rss;
     }
 
@@ -74,7 +74,7 @@ public class ChannelService {
      * 获取正在上映的电影
      */
     public Rss getMovie() {
-        Rss rss = restTemplate.getForObject(route + "douban/movie/playing", Rss.class);
+        Rss rss = restTemplate.getForObject(route + "/douban/movie/playing", Rss.class);
         return rss;
     }
 
@@ -82,7 +82,7 @@ public class ChannelService {
      * 获取当日bilibili放送列表
      */
     public Rss getBiliToday() {
-        Rss rss = restTemplate.getForObject(route + "bangumi/calendar/today", Rss.class);
+        Rss rss = restTemplate.getForObject(route + "/bangumi/calendar/today", Rss.class);
         return rss;
     }
 
