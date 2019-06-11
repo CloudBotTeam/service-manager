@@ -121,7 +121,7 @@ public class NewsService extends Servicer<RobotSendMessage2> {
 
             sendProcessedDataSingle(robotRecvMessage, message2);
 
-            sendBroadcast(news.toString());
+//            sendBroadcast(news.toString());
 
         }
     }
