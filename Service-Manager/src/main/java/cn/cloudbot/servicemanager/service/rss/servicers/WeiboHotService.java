@@ -83,16 +83,16 @@ public class WeiboHotService extends Servicer<RobotSendMessage2> {
     @Override
     public void running_logic() throws InterruptedException {
         // 自动推送子线程
-//        new Timer().scheduleAtFixedRate(new TimerTask() {
-//            @Override
-//            public void run(){
-//                try {
-//                    timer_run();
-//                } catch (InterruptedException e) {
-//                }
-//
-//            }
-//        }, 10000, 60000);
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run(){
+                try {
+                    timer_run();
+                } catch (InterruptedException e) {
+                }
+
+            }
+        }, 10000, 60000);
 
         while (true) {
             RobotSendMessage2 message2 = this.get_data();

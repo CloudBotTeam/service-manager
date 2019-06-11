@@ -36,7 +36,7 @@ public class ServicerMap {
     // TODO: 考虑使用 注解实现
     @PostConstruct
     public void initMap() {
-        servicerMap.put("echo", getServicerByName("echo"));
+//        servicerMap.put("echo", getServicerByName("echo"));
         servicerMap.put("anitamashii", getServicerByName("anitamashii"));
         servicerMap.put("bangumi", getServicerByName("bangumi"));
         servicerMap.put("sse", getServicerByName("sse"));
@@ -45,6 +45,7 @@ public class ServicerMap {
         servicerMap.put("news", getServicerByName("news")); // 刘轩
         servicerMap.put("wechat", getServicerByName("wechat")); // 邹笑寒
         servicerMap.put("chat", getServicerByName("chat")); // 冯濛
+        servicerMap.put("memo", getServicerByName("memo")); // huihui
     }
 
 

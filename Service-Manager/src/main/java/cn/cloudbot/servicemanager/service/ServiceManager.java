@@ -35,7 +35,7 @@ public class ServiceManager {
     @PostConstruct
     public void setAll() {
 
-        this.add_servicer("echo");
+//        this.add_servicer("echo");
         this.add_servicer("anitamashii");
         this.add_servicer("bangumi");
         this.add_servicer("movie");
@@ -44,6 +44,8 @@ public class ServiceManager {
         this.add_servicer("chat");
         this.add_servicer("wechat");
         this.add_servicer("news");
+        this.add_servicer("memo");
+
 
     }
 
