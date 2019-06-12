@@ -65,20 +65,19 @@ public class MovieService extends Servicer<RobotSendMessage2> {
     public boolean if_accept(RobotSendMessage2 data) {
         // 是否被AT
 
-        boolean ated = false;
         boolean name_called = false;
         for (RobotSendMessageSegment segment:
                 data.getRobotSendMessage().getMessage()) {
-            if (segment.getType().equals(MessageSegmentType.AT)) {
-                ated = true;
-            }
+//            if (segment.getType().equals(MessageSegmentType.AT)) {
+//                ated = true;
+//            }
 
-            if (segment.getType().equals(MessageSegmentType.TEXT) && segment.getData().getText().contains(serviceName())) {
+            if (segment.getType().equals(MessageSegmentType.TEXT) && segment.getData().getText().contains("电影")) {
                 name_called = true;
             }
         }
         logger.info("[Accept] movie service accepted the message.");
-        return ated && name_called;
+        return name_called;
 
     }
 

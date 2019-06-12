@@ -46,7 +46,7 @@ public class ServiceManager {
         this.add_servicer("game");
         this.add_servicer("news");
         this.add_servicer("memo");
-
+//        this.add_servicer("weibo-lin");
 
     }
 
