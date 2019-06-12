@@ -34,7 +34,7 @@ import java.util.logging.Logger;
 @Component("memo")
 public class MemoService extends Servicer<RobotSendMessage2>{
 
-	private static Logger logger = Logger.getLogger(JuejinService.class.getName());
+	private static Logger logger = Logger.getLogger(MemoService.class.getName());
 	
 	private RobotSendMessage message;
 	
@@ -62,10 +62,7 @@ public class MemoService extends Servicer<RobotSendMessage2>{
 	     
 	     for (RobotSendMessageSegment segment:
 	            data.getRobotSendMessage().getMessage()) {
-	            //if (segment.getType().equals(MessageSegmentType.AT)) {
-	                //ated = true;
-	            //}
-
+	           
 	            if (segment.getType().equals(MessageSegmentType.TEXT)) {
 	                
 	            	if (segment.getData().getText().contains("提醒")
@@ -73,16 +70,6 @@ public class MemoService extends Servicer<RobotSendMessage2>{
 	            		name_called = true;
 		            }
 	            	
-	            	//String txt = segment.getData().getText().split(" ")[1]+" "
-	            			//+segment.getData().getText().split(" ")[2];
-	            	//Host = Host.split("//")[1];
-	            	
-	            	//Date date = StrToDate(txt);    
-	            	
-	            	
-	            	//if (date!=null) {
-		            	//format =  true;
-		           // }
 	            	
 	            }
 	            
@@ -107,7 +94,7 @@ public class MemoService extends Servicer<RobotSendMessage2>{
 		RobotSendMessage2 message2 = this.get_data();
         this.message = message2.getRobotSendMessage();
         this.memo = new Memo();
-        
+        this.memo.setId(this.message.getSender().getNickname());
         setCmd();
         
         RobotRecvMessage robotRecvMessage = new RobotRecvMessage();
@@ -138,6 +125,7 @@ public class MemoService extends Servicer<RobotSendMessage2>{
         	robotRecvMessage.setMessage("@"+this.memo.getId()+" "+"你所有的备忘录："+
             		":"+readMemo(this.memo.getId()));
         	break;
+        	
         case IN:
         	DateFormat fmt2 =new SimpleDateFormat("yyyy-MM-dd");
         	String t2 = fmt2.format(this.memo.getRtime());
@@ -165,9 +153,6 @@ public class MemoService extends Servicer<RobotSendMessage2>{
 			 
 			 if (segment.getType().equals(MessageSegmentType.TEXT)){
 				 
-				 //rtme
-				 //String txt1 = segment.getData().getText().split(" ")[1]+" "
-		         			//+segment.getData().getText().split(" ")[2];
 				 String txt1 = segment.getData().getText().split("提醒我")[1];
 		         //date = StrToDate(txt1);    
 		         this.memo.setMemo(txt1);
@@ -198,12 +183,7 @@ public class MemoService extends Servicer<RobotSendMessage2>{
 	public void setCmd(){
 		//memo = new Memo();
 		
-		for (RobotSendMessageSegment segment:this.message.getMessage()){
-			 if (segment.getType().equals(MessageSegmentType.QQ)){
-					//qq
-					 this.memo.setId(segment.getData().getQq());
-				 }
-		}
+		
 		for (RobotSendMessageSegment segment:this.message.getMessage()) {
 			
 			
@@ -211,15 +191,13 @@ public class MemoService extends Servicer<RobotSendMessage2>{
 				 if (segment.getData().getText().contains("安排") &&
 						 !segment.getData().getText().contains("今天")){
 					 this.cmd=CMD.ALL;
-					 //memo = new Memo();
-					 //this.memo.setId(segment.getData().getQq());
+					
 				 }
 				 
 				 if (segment.getData().getText().contains("安排")&&
 						 segment.getData().getText().contains("今天")){
 					 this.cmd=CMD.IN;
-					 //memo = new Memo();
-					 //this.memo.setId(segment.getData().getQq());
+					
 					 this.memo.setRtime(new Date());
 				 }
 				 
@@ -318,6 +296,7 @@ public class MemoService extends Servicer<RobotSendMessage2>{
 		
 		//RobotSendMessage2 message2 = this.get_data();
         this.message = message2.getRobotSendMessage();
+        
         this.memo = new Memo();
         setCmd();
         
