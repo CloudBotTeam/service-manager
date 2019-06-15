@@ -104,11 +104,12 @@ public class WeiboHotService extends Servicer<RobotSendMessage2> {
             RobotRecvMessage robotRecvMessage = new RobotRecvMessage();
 
             StringBuilder hot = new StringBuilder();
+            hot.append("新鲜出炉的微博热搜来咯！前三的话题是：");
             ArrayList<ChannelItem> items = rss.getChannel().getItems();
-            for (int i = 0; i < 10; i++) {
-                hot.append(items.get(i).getTitle() + '\n');
+            for (int i = 1; i < 4; i++) {
+                hot.append(items.get(i).getTitle() + '，');
             }
-            hot.append("查看更多->https://s.weibo.com/top/summary?cate=realtimehot");
+            hot.append("(￣▽￣)\" 大家都好八卦啊~\n戳这里可以看更多八卦哦➡️https://s.weibo.com/top/summary?cate=realtimehot");
 
             robotRecvMessage.setMessage(hot.toString());
 

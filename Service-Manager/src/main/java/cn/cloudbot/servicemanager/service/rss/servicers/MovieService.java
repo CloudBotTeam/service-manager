@@ -107,11 +107,13 @@ public class MovieService extends Servicer<RobotSendMessage2> {
             RobotRecvMessage robotRecvMessage = new RobotRecvMessage();
 
             StringBuilder hot = new StringBuilder();
+            hot.append("🎥最近上映的高分电影前三甲是：");
             ArrayList<ChannelItem> items = rss.getChannel().getItems();
-            for (int i = 0; i < 10; i++) {
-                hot.append(items.get(i).getTitle() + '\n');
+            for (int i = 0; i < 3; i++) {
+                hot.append("《" + items.get(i).getTitle() + "》"+ '，');
             }
-            hot.append("查看更多->https://movie.douban.com/cinema/nowplaying");
+            hot.append("可以带我一起看电影吗 (●ﾟωﾟ●)~\n");
+            hot.append("更多的高分电影在这里哦➡️https://movie.douban.com/cinema/nowplaying");
 
             robotRecvMessage.setMessage(hot.toString());
 

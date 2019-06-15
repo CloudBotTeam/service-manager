@@ -62,20 +62,24 @@ public class BilibiliService extends Servicer<RobotSendMessage2> {
     public boolean if_accept(RobotSendMessage2 data) {
         // 是否被AT
 
-        boolean ated = false;
+//        boolean ated = false;
         boolean name_called = false;
         for (RobotSendMessageSegment segment:
              data.getRobotSendMessage().getMessage()) {
-            if (segment.getType().equals(MessageSegmentType.AT)) {
-                ated = true;
-            }
+//            if (segment.getType().equals(MessageSegmentType.AT)) {
+//                ated = true;
+//            }
 
-            if (segment.getType().equals(MessageSegmentType.TEXT) && segment.getData().getText().contains(serviceName())) {
-                name_called = true;
+            if (segment.getType().equals(MessageSegmentType.TEXT)) {
+                 if (segment.getData().getText().contains("up 主") ||
+                         segment.getData().getText().contains("up主") ||
+                         segment.getData().getText().contains("阿婆主") ) {
+                     name_called = true;
+                 }
             }
         }
         logger.info("[Accept] anitamashii service accepted the message.");
-        return ated && name_called;
+        return name_called;
 
     }
 
@@ -104,7 +108,7 @@ public class BilibiliService extends Servicer<RobotSendMessage2> {
 
             RobotRecvMessage robotRecvMessage = new RobotRecvMessage();
 
-            robotRecvMessage.setMessage("AnimeTamashii最新视频："+ rss.getChannel().getItems().get(0).getTitle() +
+            robotRecvMessage.setMessage("你关注的up主AnimeTamashii的最新视频在此："+ rss.getChannel().getItems().get(0).getTitle() +
                     "\n点击查看详情->" + rss.getChannel().getItems().get(0).getLink());
 
             sendProcessedDataSingle(robotRecvMessage, message2);
