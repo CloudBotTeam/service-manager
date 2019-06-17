@@ -98,15 +98,15 @@ public class WechatService extends Servicer<RobotSendMessage2> {
     @Override
     public void running_logic() throws InterruptedException {
 
-        accountID.put("同济大学", "5c276fa3497ff40f7fe4b81d");
-        accountID.put("机器之心", "5b575dd058e5c4583338dbd3");
-        accountID.put("非人哉", "5bc5447f244d4e7c65406486");
-        accountID.put("游戏时光", "5c5cea53497ff47ac121102c");
-        accountID.put("机核", "5b9e723a244d4e7878c5b438");
+        accountID.put("知乎日报", "zhihuribao");
+        accountID.put("机器之心", "almosthuman2014");
+        accountID.put("混子曰", "hey-stone");
+        accountID.put("游戏时光", "VGTIME2015");
+        accountID.put("机核", "gamecores");
 
         List<String> St = new ArrayList<>();
         St.add("说到这个，");
-        St.add("既然你们在讨论这个，");
+        St.add("既然你们在讨论这个，那");
         St.add("你们对这种东西感兴趣吗，那");
         St.add("告诉你们一个秘密，");
 

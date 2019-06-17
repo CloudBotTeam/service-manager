@@ -42,12 +42,12 @@ public class ServiceManager {
 //        this.add_servicer("sse");
         this.add_servicer("hot");
         this.add_servicer("chat");
-//        this.add_servicer("wechat");
+        this.add_servicer("wechat");
         this.add_servicer("game");
         this.add_servicer("news");
         this.add_servicer("memo");
         this.add_servicer("weibo");
-
+        this.add_servicer("juejin");
     }
 
     private Map<String, Servicer<RobotSendMessage2>> servicerMap = new ConcurrentHashMap<>();

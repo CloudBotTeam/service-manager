@@ -43,11 +43,12 @@ public class ServicerMap {
         servicerMap.put("hot", getServicerByName("hot"));
         servicerMap.put("movie", getServicerByName("movie"));
         servicerMap.put("news", getServicerByName("news")); // 刘轩
-//        servicerMap.put("wechat", getServicerByName("wechat")); // 邹笑寒
+        servicerMap.put("wechat", getServicerByName("wechat")); // 邹笑寒
         servicerMap.put("game", getServicerByName("game")); // 邹笑寒
         servicerMap.put("chat", getServicerByName("chat")); // 冯濛
         servicerMap.put("memo", getServicerByName("memo")); // huihui
         servicerMap.put("weibo", getServicerByName("weibo")); // leilei
+        servicerMap.put("weibo", getServicerByName("juejin"));
     }
 
 

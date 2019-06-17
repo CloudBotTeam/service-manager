@@ -97,7 +97,7 @@ public class ChannelService {
      * @return Rss(json)
      */
     public Rss getWechatById(String uid) {
-        Rss rss = restTemplate.getForObject(route + "/wechat/wasi/" + uid, Rss.class);
+        Rss rss = restTemplate.getForObject(route + "/wechat/csm/" + uid, Rss.class);
         return rss;
     }
 
