@@ -37,17 +37,17 @@ public class ServicerMap {
     @PostConstruct
     public void initMap() {
 //        servicerMap.put("echo", getServicerByName("echo"));
-        servicerMap.put("anitamashii", getServicerByName("anitamashii"));
+        servicerMap.put("up", getServicerByName("up"));
         servicerMap.put("bangumi", getServicerByName("bangumi"));
-        servicerMap.put("sse", getServicerByName("sse"));
+//        servicerMap.put("sse", getServicerByName("sse"));
         servicerMap.put("hot", getServicerByName("hot"));
         servicerMap.put("movie", getServicerByName("movie"));
         servicerMap.put("news", getServicerByName("news")); // 刘轩
-        servicerMap.put("wechat", getServicerByName("wechat")); // 邹笑寒
+//        servicerMap.put("wechat", getServicerByName("wechat")); // 邹笑寒
         servicerMap.put("game", getServicerByName("game")); // 邹笑寒
         servicerMap.put("chat", getServicerByName("chat")); // 冯濛
         servicerMap.put("memo", getServicerByName("memo")); // huihui
-//        servicerMap.put("weibo-lin", getServicerByName("weibo-lin")); //
+        servicerMap.put("weibo", getServicerByName("weibo")); // leilei
     }
 
 

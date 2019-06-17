@@ -67,21 +67,21 @@ public class NewsService extends Servicer<RobotSendMessage2> {
     public boolean if_accept(RobotSendMessage2 data) {
         // 是否被AT
 
-        boolean ated = false;
+//        boolean ated = false;
         boolean name_called = false;
         for (RobotSendMessageSegment segment:
                 data.getRobotSendMessage().getMessage()) {
-            if (segment.getType().equals(MessageSegmentType.AT)) {
-                ated = true;
-            }
+//            if (segment.getType().equals(MessageSegmentType.AT)) {
+//                ated = true;
+//            }
 
-            if (segment.getType().equals(MessageSegmentType.TEXT) && segment.getData().getText().contains(serviceName())) {
+            if (segment.getType().equals(MessageSegmentType.TEXT) && segment.getData().getText().contains("新闻")) {
                 name_called = true;
             }
         }
         logger.info("[Accept] news service accepted the message.");
 
-        return ated && name_called;
+        return name_called;
 
     }
 
@@ -89,33 +89,35 @@ public class NewsService extends Servicer<RobotSendMessage2> {
     @Override
     public void running_logic() throws InterruptedException {
         // 自动推送子线程
-        new Timer().scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run(){
-                try {
-                    timer_run();
-                } catch (InterruptedException e) {
-                }
-
-            }
-        }, 10000, 60000);
+//        new Timer().scheduleAtFixedRate(new TimerTask() {
+//            @Override
+//            public void run(){
+//                try {
+//                    timer_run();
+//                } catch (InterruptedException e) {
+//                }
+//
+//            }
+//        }, 10000, 60000);
 
         while (true) {
             RobotSendMessage2 message2 = this.get_data();
             this.message = message2.getRobotSendMessage(); // 阻塞直到收到消息
 
-            Rss rss = redisRssService.getRssByField(serviceName());
+//            Rss rss = redisRssService.getRssByField(serviceName());
+            Rss rss = channelController.getNews();
 
             RobotRecvMessage robotRecvMessage = new RobotRecvMessage();
 
             StringBuilder news = new StringBuilder();
             ArrayList<ChannelItem> items = rss.getChannel().getItems();
 
+            news.append("没想到你还是一个关注新闻的人😲！现在最新的新闻📰有：");
             //返回十条央视最新新闻
-            for (int i = 0; i < 10; i++) {
-                news.append(items.get(i).getTitle() + '\n');
+            for (int i = 0; i < 3; i++) {
+                news.append(items.get(i).getTitle() + '，');
             }
-            news.append("查看更多->http://news.cctv.com/world");
+            news.append("戳这里可以阅读更多新闻👉http://news.cctv.com/world");
 //            system.out(news)
             robotRecvMessage.setMessage(news.toString());
 

@@ -52,7 +52,7 @@ public class BiliTodayService extends Servicer<RobotSendMessage2> {
             } else {
                 // update cache
                 redisRssService.setRssWithField(serviceName(), rss);
-                sendBroadcast(rss.getChannel().getItems().toString());
+//                sendBroadcast(rss.getChannel().getItems().toString());
             }
         }
     }
@@ -66,20 +66,20 @@ public class BiliTodayService extends Servicer<RobotSendMessage2> {
     public boolean if_accept(RobotSendMessage2 data) {
         // 是否被AT
 
-        boolean ated = false;
+//        boolean ated = false;
         boolean name_called = false;
         for (RobotSendMessageSegment segment:
                 data.getRobotSendMessage().getMessage()) {
-            if (segment.getType().equals(MessageSegmentType.AT)) {
-                ated = true;
-            }
+//            if (segment.getType().equals(MessageSegmentType.AT)) {
+//                ated = true;
+//            }
 
-            if (segment.getType().equals(MessageSegmentType.TEXT) && segment.getData().getText().contains(serviceName())) {
+            if (segment.getType().equals(MessageSegmentType.TEXT) && segment.getData().getText().contains("放送")) {
                 name_called = true;
             }
         }
         logger.info("[Accept] bangumi service accepted the message.");
-        return ated && name_called;
+        return name_called;
 
     }
 
@@ -87,32 +87,36 @@ public class BiliTodayService extends Servicer<RobotSendMessage2> {
     @Override
     public void running_logic() throws InterruptedException {
         // 自动推送子线程
-        new Timer().scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run(){
-                try {
-                    logger.info("Timer TTask called.");
-                    timer_run();
-                } catch (InterruptedException e) {
-                    logger.info("Timer meets interupts");
-                }
-
-            }
-        }, 10000, 60000);
+//        new Timer().scheduleAtFixedRate(new TimerTask() {
+//            @Override
+//            public void run(){
+//                try {
+//                    logger.info("Timer TTask called.");
+//                    timer_run();
+//                } catch (InterruptedException e) {
+//                    logger.info("Timer meets interupts");
+//                }
+//
+//            }
+//        }, 10000, 60000);
 
         while (true) {
             RobotSendMessage2 message2 = this.get_data();
             this.message = message2.getRobotSendMessage(); // 阻塞直到收到消息
 
-            Rss rss = redisRssService.getRssByField(serviceName());
+//            Rss rss = redisRssService.getRssByField(serviceName());
+            Rss rss = channelController.getBiliToday();
+
 
             RobotRecvMessage robotRecvMessage = new RobotRecvMessage();
 
             StringBuilder hot = new StringBuilder();
             ArrayList<ChannelItem> items = rss.getChannel().getItems();
-            for (int i = 0; i < 10; i++) {
-                hot.append(items.get(i).getTitle() + '\n');
+            hot.append("今日放送特别精彩😀，有：");
+            for (int i = 0; i < 3; i++) {
+                hot.append(items.get(i).getTitle() + '，');
             }
+            hot.append("还等啥快去看啊！");
             robotRecvMessage.setMessage(hot.toString());
 
             sendProcessedDataSingle(robotRecvMessage, message2);

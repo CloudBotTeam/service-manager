@@ -36,17 +36,17 @@ public class ServiceManager {
     public void setAll() {
 
 //        this.add_servicer("echo");
-        this.add_servicer("anitamashii");
+        this.add_servicer("up");
         this.add_servicer("bangumi");
         this.add_servicer("movie");
-        this.add_servicer("sse");
+//        this.add_servicer("sse");
         this.add_servicer("hot");
         this.add_servicer("chat");
-        this.add_servicer("wechat");
+//        this.add_servicer("wechat");
         this.add_servicer("game");
         this.add_servicer("news");
         this.add_servicer("memo");
-//        this.add_servicer("weibo-lin");
+        this.add_servicer("weibo");
 
     }
 

@@ -51,7 +51,7 @@ public class MovieService extends Servicer<RobotSendMessage2> {
             } else {
                 // update cache
                 redisRssService.setRssWithField(serviceName(), rss);
-                sendBroadcast(rss.getChannel().getItems().toString());
+//                sendBroadcast(rss.getChannel().getItems().toString());
             }
         }
     }
@@ -85,24 +85,25 @@ public class MovieService extends Servicer<RobotSendMessage2> {
     @Override
     public void running_logic() throws InterruptedException {
         // 自动推送子线程
-        new Timer().scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run(){
-                try {
-                    logger.info("Timer TTask called.");
-                    timer_run();
-                } catch (InterruptedException e) {
-                    logger.info("Timer meets interupts");
-                }
-
-            }
-        }, 10000, 60000);
+//        new Timer().scheduleAtFixedRate(new TimerTask() {
+//            @Override
+//            public void run(){
+//                try {
+//                    logger.info("Timer TTask called.");
+//                    timer_run();
+//                } catch (InterruptedException e) {
+//                    logger.info("Timer meets interupts");
+//                }
+//
+//            }
+//        }, 10000, 60000);
 
         while (true) {
             RobotSendMessage2 message2 = this.get_data();
             this.message = message2.getRobotSendMessage(); // 阻塞直到收到消息
 
-            Rss rss = redisRssService.getRssByField(serviceName());
+//            Rss rss = redisRssService.getRssByField(serviceName());
+            Rss rss = channelController.getMovie();
 
             RobotRecvMessage robotRecvMessage = new RobotRecvMessage();
 

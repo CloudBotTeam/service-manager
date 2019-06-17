@@ -84,22 +84,23 @@ public class WeiboHotService extends Servicer<RobotSendMessage2> {
     @Override
     public void running_logic() throws InterruptedException {
         // 自动推送子线程
-        new Timer().scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run(){
-                try {
-                    timer_run();
-                } catch (InterruptedException e) {
-                }
-
-            }
-        }, 10000, 60000);
+//        new Timer().scheduleAtFixedRate(new TimerTask() {
+//            @Override
+//            public void run(){
+//                try {
+//                    timer_run();
+//                } catch (InterruptedException e) {
+//                }
+//
+//            }
+//        }, 10000, 60000);
 
         while (true) {
             RobotSendMessage2 message2 = this.get_data();
             this.message = message2.getRobotSendMessage(); // 阻塞直到收到消息
 
-            Rss rss = redisRssService.getRssByField(serviceName());
+//            Rss rss = redisRssService.getRssByField(serviceName());
+            Rss rss = channelController.getWeiboHot();
 
             RobotRecvMessage robotRecvMessage = new RobotRecvMessage();
 
@@ -109,7 +110,7 @@ public class WeiboHotService extends Servicer<RobotSendMessage2> {
             for (int i = 1; i < 4; i++) {
                 hot.append(items.get(i).getTitle() + '，');
             }
-            hot.append("(￣▽￣)\" 大家都好八卦啊~\n戳这里可以看更多八卦哦➡️https://s.weibo.com/top/summary?cate=realtimehot");
+            hot.append("(￣▽￣)\" 大家都好八卦啊~\n戳这里可以看更多八卦哦👉https://s.weibo.com/top/summary?cate=realtimehot");
 
             robotRecvMessage.setMessage(hot.toString());
 

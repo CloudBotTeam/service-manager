@@ -79,10 +79,10 @@ public class GameService extends Servicer<RobotSendMessage2> {
         Mid.add("你们一定不知道，");
 
         List<String> Ed = new ArrayList<>();
-        Ed.add("任天堂天下第一：");
-        Ed.add("索尼辣鸡，不如玩任天堂：");
-        Ed.add("看看任天堂的游戏吧：");
-        Ed.add("Eshop上有新游戏了：");
+        Ed.add("任天堂🎮天下第一：");
+        Ed.add("索尼辣鸡，不如玩任天堂🎮：");
+        Ed.add("看看任天堂的游戏🎮吧：");
+        Ed.add("Eshop上有新游戏🎮了：");
 
 
         while (true) {
@@ -105,9 +105,9 @@ public class GameService extends Servicer<RobotSendMessage2> {
             ArrayList<ChannelItem> items = rss.getChannel().getItems();
 
             int sentLength = items.size();
-            for (int i = 0; i < sentLength; i++) {
+            for (int i = 0; i < 3; i++) {
                 articles.append(items.get(i).getTitle() + '\n');
-                articles.append("剁手-> " + items.get(i).getLink() + '\n' + '\n');
+                articles.append("剁手👉 " + items.get(i).getLink() + '\n');
             }
 
             robotRecvMessage.setMessage(articles.toString());

@@ -1,16 +1,23 @@
 package cn.cloudbot.servicemanager.service.rss.servicers;
 
+import cn.cloudbot.common.Message.BotMessage.MessageSegmentType;
 import cn.cloudbot.common.Message.BotMessage.RobotSendMessage;
 import cn.cloudbot.common.Message.BotMessage.RobotSendMessageSegment;
 import cn.cloudbot.common.Message.ServiceMessage.RobotRecvMessage;
+import cn.cloudbot.common.Message2.RobotSendMessage2;
 import cn.cloudbot.servicemanager.service.Servicer;
 import cn.cloudbot.servicemanager.service.rss.service.ChannelService;
+import cn.cloudbot.servicemanager.service.rss.pojo.ChannelItem;
 import cn.cloudbot.servicemanager.service.rss.pojo.Rss;
+import cn.cloudbot.servicemanager.service.rss.service.RedisRssService;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Logger;
 
 /**
@@ -19,97 +26,123 @@ import java.util.logging.Logger;
  **/
 
 @Data
-@Component("weibo-lin")
-public class WeiboService extends Servicer<RobotSendMessage> {
-    private static Logger logger = Logger.getLogger(WeiboService.class.getName());
+@Component("weibo")
+public class WeiboService extends Servicer<RobotSendMessage2> {
+    private static Logger logger = Logger.getLogger(NewsService.class.getName());
 
     @Autowired
     private ChannelService channelController;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private RedisRssService redisRssService;
 
     private RobotSendMessage message;
 
-    private RobotSendMessageSegment[] receivedMsg;
+    public void timer_run() throws InterruptedException {
+//        Rss rss = channelController.getWeiboByUserId();
+        Rss rss = channelController.getWeiboByUserId("2883790292");
+        Rss redisRss = redisRssService.getRssByField(serviceName());
+        if (redisRss == null) {
+            redisRssService.setRssWithField(serviceName(), rss);
+        }
+        else {
+//            if(rss.equals(redisRss)) {
+            if (rss.getChannel().getItems().get(0).getTitle().equals(redisRss.getChannel().getItems().get(0).getTitle())) {
+                // data cached in redis is not out date
+//                logger.info("[ == 微博博主 == 无 == ] 检测到没有新微博");
+//                logger.info("rss ==>" + rss.getChannel().getItems().get(0).getTitle());
+//                logger.info("redis ==>" + redisRss.getChannel().getItems().get(0).getTitle());
+                return;
+            } else {
+                // update cache
+                redisRssService.setRssWithField(serviceName(), rss);
+//                RobotRecvMessage robotRecvMessage = new RobotRecvMessage();
 
-    private RobotRecvMessage sendMsg;
+                logger.info("[ == 微博博主 == ] 检测到新微博");
 
-    // 每 10s 请求一次林俊杰的微博
-    public class AutoWeibo implements Runnable {
-        @Override
-        public void run() {
-            while (true) {
-                logger.info("[request] weibo-lin requests");
-                Rss rss = channelController.getTJUSSExwdt();
-                Rss redisRss = (Rss) redisTemplate.opsForValue().get("weibo-lin");
-                if (redisRss == null) {
-                    redisTemplate.opsForValue().set("weibo-lin", rss);
-                }
-                else {
-                    if (rss.getChannel().getItems().get(0).getPubDate() == redisRss.getChannel().getItems().get(0).getPubDate()) {
-                        logger.info("No weibo-lin update.");
-                    }
-                    else {
-                        redisTemplate.opsForValue().set("weibo-lin", rss);
-                        String broadcastMsg = "林俊杰更新微博啦：" + rss.getChannel().getItems().get(0).getTitle() +
-                                "\n点击查看详情->" + rss.getChannel().getItems().get(0).getLink();
-                        sendBroadcast(broadcastMsg);
-                    }
-                }
-                try {
-                    Thread.sleep(10000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                // StringBuilder hot = new StringBuilder();
+                // hot.append("新鲜出炉的微博热搜来咯！前三的话题是：");
+                // ArrayList<ChannelItem> items = rss.getChannel().getItems();
+                // for (int i = 1; i < 4; i++) {
+                //     hot.append(items.get(i).getTitle() + '，');
+                // }
+                // hot.append("(￣▽￣)\" 大家都好八卦啊~\n戳这里可以看更多八卦哦➡️https://s.weibo.com/top/summary?cate=realtimehot");
+
+//                robotRecvMessage.setMessage("叮咚！你订阅的博主发微博了！😀Ta说：" + rss.getChannel().getItems().get(0).getTitle() +
+//                        "\n快戳这里第一时间抢沙发！👉" + rss.getChannel().getItems().get(0).getLink());
+
+//                sendProcessedDataSingle(robotRecvMessage, message2);
+                sendBroadcast("叮咚！你订阅的博主发微博了！😀Ta说：" + rss.getChannel().getItems().get(0).getTitle() +
+                        "\n快戳这里第一时间抢沙发！👉" + rss.getChannel().getItems().get(0).getLink());
             }
         }
     }
-
-    public Boolean isSentToMe() {
-        // 默认第一段消息是命令
-        this.receivedMsg =  this.message.getMessage();
-        if (this.receivedMsg[0].getData().getText().equals("微博林俊杰")) {
-            // 初始化要回复的消息
-            this.sendMsg.setGroup_id(this.message.getGroup_id());
-            this.sendMsg.setPlatform(this.message.getPlatform());
-            this.sendMsg.setMessage(this.message.getMessage()[0].getData().getText());
-            return true;
-        }
-        return false;
-    }
-
-    public void sendBack() {
-        Rss rss = channelController.getWeiboByUserId("1195354434");
-        sendMsg.setMessage("林俊杰最新微博：" + rss.getChannel().getItems().get(0).getTitle() +
-                "\n点击查看详情->" + rss.getChannel().getItems().get(0).getLink());
-        logger.info("[send] weibo service sent " + sendMsg);
-        sendProcessedDataBack(sendMsg);
-    }
-
 
     @Override
     public String serviceName() {
-        return "weibo-lin";
+        return "weibo";
     }
 
     @Override
-    public boolean if_accept(RobotSendMessage data) {
-        // 每条都收
-        logger.info("[Accept] weibo service accepted the message.");
-        return true;
+    public boolean if_accept(RobotSendMessage2 data) {
+        // 是否被AT
+
+//        boolean ated = false;
+        boolean name_called = false;
+        for (RobotSendMessageSegment segment:
+                data.getRobotSendMessage().getMessage()) {
+//            if (segment.getType().equals(MessageSegmentType.AT)) {
+//                ated = true;
+//            }
+
+            if (segment.getType().equals(MessageSegmentType.TEXT) )
+                if (segment.getData().getText().contains("最新微博") ||
+                        segment.getData().getText().contains("最新一条微博")) {
+                name_called = true;
+            }
+        }
+        return name_called;
+
     }
+
 
     @Override
     public void running_logic() throws InterruptedException {
-        Thread autoRss = new Thread(new AutoWeibo());
-        autoRss.setDaemon(true);
-        autoRss.start();
-        while (true) {
-            this.message = this.get_data();
-            if (isSentToMe()) {
-                sendBack();
+        // 自动推送子线程
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run(){
+                try {
+                    timer_run();
+                } catch (InterruptedException e) {
+                }
+
             }
+        }, 10000, 10000);
+        // 10000, 60000
+
+        while (true) {
+            RobotSendMessage2 message2 = this.get_data();
+            this.message = message2.getRobotSendMessage(); // 阻塞直到收到消息
+
+//            Rss rss = redisRssService.getRssByField(serviceName());
+            Rss rss = channelController.getWeiboByUserId("2883790292");
+
+            RobotRecvMessage robotRecvMessage = new RobotRecvMessage();
+
+            // StringBuilder hot = new StringBuilder();
+            // hot.append("新鲜出炉的微博热搜来咯！前三的话题是：");
+            // ArrayList<ChannelItem> items = rss.getChannel().getItems();
+            // for (int i = 1; i < 4; i++) {
+            //     hot.append(items.get(i).getTitle() + '，');
+            // }
+            // hot.append("(￣▽￣)\" 大家都好八卦啊~\n戳这里可以看更多八卦哦➡️https://s.weibo.com/top/summary?cate=realtimehot");
+
+            robotRecvMessage.setMessage("叮咚！你订阅的博主发微博了！😀Ta说：" + rss.getChannel().getItems().get(0).getTitle() +
+                    "\n快戳这里第一时间抢沙发！👉" + rss.getChannel().getItems().get(0).getLink());
+
+            sendProcessedDataSingle(robotRecvMessage, message2);
         }
     }
+
 }

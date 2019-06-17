@@ -41,6 +41,11 @@ public class ChannelService {
         return rss;
     }
 
+//    public Rss getWeiboByUserId() {
+//        Rss rss = restTemplate.getForObject(route + "/weibo/user/2883790292", Rss.class);
+//        return rss;
+//    }
+
     /**
      * 获取微博热搜
      * @return
