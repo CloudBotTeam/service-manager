@@ -16,6 +16,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
@@ -25,7 +27,7 @@ import java.util.logging.Logger;
  * @since: 2019-05-27
  **/
 
-@Data
+//@Data
 @Component("news")
 public class NewsService extends Servicer<RobotSendMessage2> {
     private static Logger logger = Logger.getLogger(NewsService.class.getName());
@@ -38,6 +40,7 @@ public class NewsService extends Servicer<RobotSendMessage2> {
 
     private RobotSendMessage message;
 
+
     public void timer_run() throws InterruptedException {
         logger.info("[request] news requests");
 
@@ -45,15 +48,16 @@ public class NewsService extends Servicer<RobotSendMessage2> {
         Rss redisRss = redisRssService.getRssByField(serviceName());
         if (redisRss == null) {
             redisRssService.setRssWithField(serviceName(), rss);
+            sendBroadcast(rss.getChannel().getItems().toString());
         }
         else {
             if(rss.equals(redisRss)) {
-                // data cached in redis is not out date
-
                 return;
+
             } else {
                 // update cache
                 redisRssService.setRssWithField(serviceName(), rss);
+//                sendBroadcast(rss.getChannel().getItems().toString());
             }
         }
     }
@@ -65,26 +69,40 @@ public class NewsService extends Servicer<RobotSendMessage2> {
 
     @Override
     public boolean if_accept(RobotSendMessage2 data) {
-        // 是否被AT
+        // 是否调用当前news服务
 
-        boolean ated = false;
         boolean name_called = false;
         for (RobotSendMessageSegment segment:
                 data.getRobotSendMessage().getMessage()) {
-            if (segment.getType().equals(MessageSegmentType.AT)) {
-                ated = true;
-            }
+//            if (segment.getType().equals(MessageSegmentType.AT)) {
+//                ated = true;
+//            }
 
-            if (segment.getType().equals(MessageSegmentType.TEXT) && segment.getData().getText().contains(serviceName())) {
+            if (segment.getType().equals(MessageSegmentType.TEXT) && segment.getData().getText().contains("新闻")) {
+
                 name_called = true;
             }
         }
         logger.info("[Accept] news service accepted the message.");
 
-        return ated && name_called;
+        return name_called;
 
     }
 
+    public  void test(){
+        Calendar calendar = Calendar.getInstance();
+
+    //19：00定时发送
+        calendar.set(Calendar.DAY_OF_MONTH,17);
+        calendar.set(Calendar.MONTH, 5);
+        calendar.set(Calendar.HOUR_OF_DAY, 14);
+        calendar.set(Calendar.MINUTE, 20);
+        calendar.set(Calendar.SECOND, 1);
+
+        Date time = calendar.getTime();
+        Timer timer = new Timer();
+//        timer.schedule(new RemindTask(), time, 60 * 1000);
+    }
 
     @Override
     public void running_logic() throws InterruptedException {
@@ -93,14 +111,17 @@ public class NewsService extends Servicer<RobotSendMessage2> {
             @Override
             public void run(){
                 try {
+                    logger.info("Timer TTask called.");
                     timer_run();
                 } catch (InterruptedException e) {
+                    logger.info("Timer meets interupts");
                 }
-
             }
         }, 10000, 60000);
 
+
         while (true) {
+//            test();
             RobotSendMessage2 message2 = this.get_data();
             this.message = message2.getRobotSendMessage(); // 阻塞直到收到消息
 
@@ -111,19 +132,18 @@ public class NewsService extends Servicer<RobotSendMessage2> {
             StringBuilder news = new StringBuilder();
             ArrayList<ChannelItem> items = rss.getChannel().getItems();
 
-            //返回十条央视最新新闻
-            for (int i = 0; i < 10; i++) {
-                news.append(items.get(i).getTitle() + '\n');
+            //返回5条央视最新新闻
+            news.append("小报童来了~📰 热点新闻请您查收！\n");
+
+            for (int i = 0; i < 5; i++) {
+                news.append(items.get(i).getTitle() + '\n'+'\n');
             }
-            news.append("查看更多->http://news.cctv.com/world");
-//            system.out(news)
+            news.append("更多新闻资讯请点击➡️http://news.cctv.com/world");
+
             robotRecvMessage.setMessage(news.toString());
 
             sendProcessedDataSingle(robotRecvMessage, message2);
-
-//            sendBroadcast(news.toString());
-
         }
     }
-
 }
+
