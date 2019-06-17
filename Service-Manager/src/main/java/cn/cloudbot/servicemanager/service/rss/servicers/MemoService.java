@@ -90,55 +90,59 @@ public class MemoService extends Servicer<RobotSendMessage2>{
 	@Override
 	public void running_logic() throws InterruptedException {
 		// TODO Auto-generated method stub
-		
-		RobotSendMessage2 message2 = this.get_data();
-        this.message = message2.getRobotSendMessage();
-        this.memo = new Memo();
-        this.memo.setId(this.message.getSender().getNickname());
-        setCmd();
-        
-        RobotRecvMessage robotRecvMessage = new RobotRecvMessage();
-        
-        switch(cmd){
-        case MEMO:
-        	DateFormat fmt =new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        	String t1 = fmt.format(this.memo.getRtime());
-        	RobotRecvMessage robotRecvMessage1 = new RobotRecvMessage();
-        	 robotRecvMessage1.setMessage("@"+this.memo.getId()+" "+"好的，我将在"+
-        			 t1+"提醒你"+this.memo.getMemo());
-        	 sendProcessedDataSingle(robotRecvMessage1, message2);
-        	
-        	long diff= this.memo.getRtime().getTime()-new Date().getTime();
-        	if(diff>=0){
-        		Thread.sleep(diff);
-        	}
-        	
-        	//RobotRecvMessage robotRecvMessage2 = new RobotRecvMessage();
-            robotRecvMessage.setMessage("@"+this.memo.getId()+" 您在"+
-            		t1+"有一条备忘录"+this.memo.getMemo());
 
-            //sendProcessedDataSingle(robotRecvMessage, message2);
-            
-        	break;
-        	
-        case ALL:
-        	robotRecvMessage.setMessage("@"+this.memo.getId()+" "+"你所有的备忘录："+
-            		":"+readMemo(this.memo.getId()));
-        	break;
-        	
-        case IN:
-        	DateFormat fmt2 =new SimpleDateFormat("yyyy-MM-dd");
-        	String t2 = fmt2.format(this.memo.getRtime());
-        	robotRecvMessage.setMessage("@"+this.memo.getId()+" "+t2+"所有的备忘录："
-        								+readMemo(this.memo.getId()+"_"+t2));
-        	break;
-        
-        case NULL:
-            robotRecvMessage.setMessage("WRONG FORMAT");
-        	break;
-        }
-        
-        sendProcessedDataSingle(robotRecvMessage, message2);
+		while(true) {
+
+			RobotSendMessage2 message2 = this.get_data();
+			this.message = message2.getRobotSendMessage();
+			this.memo = new Memo();
+			this.memo.setId(this.message.getSender().getNickname());
+			setCmd();
+
+			RobotRecvMessage robotRecvMessage = new RobotRecvMessage();
+
+			switch (cmd) {
+				case MEMO:
+					DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+					String t1 = fmt.format(this.memo.getRtime());
+					RobotRecvMessage robotRecvMessage1 = new RobotRecvMessage();
+					robotRecvMessage1.setMessage("@" + this.memo.getId() + " " + "好的，我将在" +
+							t1 + "提醒你" + this.memo.getMemo());
+					sendProcessedDataSingle(robotRecvMessage1, message2);
+
+					long diff = this.memo.getRtime().getTime() - new Date().getTime();
+					if (diff >= 0) {
+						Thread.sleep(diff);
+					}
+
+					//RobotRecvMessage robotRecvMessage2 = new RobotRecvMessage();
+					robotRecvMessage.setMessage("@" + this.memo.getId() + " 您在" +
+							t1 + "有一条备忘录" + this.memo.getMemo());
+
+					//sendProcessedDataSingle(robotRecvMessage, message2);
+
+					break;
+
+				case ALL:
+					robotRecvMessage.setMessage("@" + this.memo.getId() + " " + "你所有的备忘录：" +
+							":" + readMemo(this.memo.getId()));
+					break;
+
+				case IN:
+					DateFormat fmt2 = new SimpleDateFormat("yyyy-MM-dd");
+					String t2 = fmt2.format(this.memo.getRtime());
+					robotRecvMessage.setMessage("@" + this.memo.getId() + " " + t2 + "所有的备忘录："
+							+ readMemo(this.memo.getId() + "_" + t2));
+					break;
+
+				case NULL:
+					robotRecvMessage.setMessage("WRONG FORMAT");
+					break;
+			}
+
+			sendProcessedDataSingle(robotRecvMessage, message2);
+
+		}
      
 	}
 	
