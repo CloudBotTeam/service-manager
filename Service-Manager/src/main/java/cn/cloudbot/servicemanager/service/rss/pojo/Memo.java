@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.TimeZone;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlCData;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
@@ -25,11 +26,13 @@ import lombok.NoArgsConstructor;
 
 
 
+
 //@NoArgsConstructor
 //@AllArgsConstructor
 //@JacksonXmlRootElement(localName = "memo")
 @Data //getter setter
 public class Memo {
+	
 	
 	//@JacksonXmlProperty(localName = "id")
     private String id;
@@ -42,6 +45,7 @@ public class Memo {
 	//@JacksonXmlCData(value = true) // 序列化时是否总是使用 CDATA 块
     private String memo;
     
+    //private CMD cmd;
     //private String tag;
     public  Memo() {}
     public Memo(String ID ,Date WTIME,Date RTIME,String MEMO){
@@ -62,8 +66,10 @@ public class Memo {
     public void writefile() throws IOException{
     	
     	DateFormat fmt =new SimpleDateFormat("yyyy-MM-dd");
+    	fmt.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
     	String t1 = fmt.format(this.getRtime());
     	DateFormat fmt2 =new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    	fmt2.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
     	String t2 = fmt2.format(this.getRtime());
     	//String time= 
     	String filename =this.id+"_"+t1;
@@ -71,7 +77,7 @@ public class Memo {
 		if(!writename.exists()){
 			writename.createNewFile(); // 创建新文件
 		}
-		BufferedWriter out = new BufferedWriter(new FileWriter(writename));
+		BufferedWriter out = new BufferedWriter(new FileWriter(writename,true));
 		out.write(t2+":"+this.memo+"\r\n"); // \r\n即为换行s
 		out.flush(); // 把缓存区内容压入文件
 		out.close(); // 最后记得关闭文件
