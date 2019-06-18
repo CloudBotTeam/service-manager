@@ -7,12 +7,10 @@ import cn.cloudbot.common.Message.ServiceMessage.RobotRecvMessage;
 import cn.cloudbot.common.Message2.RobotSendMessage2;
 import cn.cloudbot.servicemanager.service.Servicer;
 import cn.cloudbot.servicemanager.service.rss.service.ChannelService;
-import cn.cloudbot.servicemanager.service.rss.pojo.ChannelItem;
 import cn.cloudbot.servicemanager.service.rss.pojo.Rss;
 import cn.cloudbot.servicemanager.service.rss.service.RedisRssService;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -97,7 +95,8 @@ public class WeiboService extends Servicer<RobotSendMessage2> {
 
             if (segment.getType().equals(MessageSegmentType.TEXT) )
                 if (segment.getData().getText().contains("最新微博") ||
-                        segment.getData().getText().contains("最新一条微博")) {
+                        segment.getData().getText().contains("最新一条微博") ||
+                        segment.getData().getText().contains("最新微博")){
                 name_called = true;
             }
         }
@@ -138,7 +137,7 @@ public class WeiboService extends Servicer<RobotSendMessage2> {
             // }
             // hot.append("(￣▽￣)\" 大家都好八卦啊~\n戳这里可以看更多八卦哦➡️https://s.weibo.com/top/summary?cate=realtimehot");
 
-            robotRecvMessage.setMessage("叮咚！你订阅的博主发微博了！😀Ta说：" + rss.getChannel().getItems().get(0).getTitle() +
+            robotRecvMessage.setMessage("叮咚！你订阅的博主最新一条微博在此！😀Ta说：" + rss.getChannel().getItems().get(0).getTitle() +
                     "\n快戳这里第一时间抢沙发！👉" + rss.getChannel().getItems().get(0).getLink());
 
             sendProcessedDataSingle(robotRecvMessage, message2);

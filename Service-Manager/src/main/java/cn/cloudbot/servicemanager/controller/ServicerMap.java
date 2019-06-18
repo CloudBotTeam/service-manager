@@ -48,7 +48,7 @@ public class ServicerMap {
         servicerMap.put("chat", getServicerByName("chat")); // 冯濛
         servicerMap.put("memo", getServicerByName("memo")); // huihui
         servicerMap.put("weibo", getServicerByName("weibo")); // leilei
-        servicerMap.put("weibo", getServicerByName("juejin"));
+        servicerMap.put("juejin", getServicerByName("juejin"));
     }
 
 

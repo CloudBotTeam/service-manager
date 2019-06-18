@@ -134,8 +134,8 @@ public class NewsService extends Servicer<RobotSendMessage2> {
 
             news.append("小报童来了~📰 热点新闻请您查收！\n");
             //返回十条央视最新新闻
-            for (int i = 0; i < 5; i++) {
-                news.append(items.get(i).getTitle() + '\n');
+            for (int i = 0; i < 3; i++) {
+                news.append("💡 " + items.get(i).getTitle() + '\n');
             }
             news.append("戳这里可以阅读更多新闻👉http://news.cctv.com/world");
 //            system.out(news)
