@@ -3,8 +3,10 @@ package cn.cloudbot.servicemanager.service.rss.pojo;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -77,7 +79,10 @@ public class Memo {
 		if(!writename.exists()){
 			writename.createNewFile(); // 创建新文件
 		}
-		BufferedWriter out = new BufferedWriter(new FileWriter(writename,true));
+		 String encoding = "GBK";
+		OutputStreamWriter write = new OutputStreamWriter(
+                 new FileOutputStream(writename), "gbk");// 考虑到编码格式
+		BufferedWriter out = new BufferedWriter(write);
 		out.write(t2+":"+this.memo+"\r\n"); // \r\n即为换行s
 		out.flush(); // 把缓存区内容压入文件
 		out.close(); // 最后记得关闭文件

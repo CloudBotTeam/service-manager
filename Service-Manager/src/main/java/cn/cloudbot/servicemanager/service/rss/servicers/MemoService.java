@@ -163,7 +163,7 @@ public class MemoService extends Servicer<RobotSendMessage2>{
 
 				case ALL:
 					robotRecvMessage.setMessage("@" + memo.getId() + " " + "你所有的备忘录：" +
-							":" + readMemo(memo.getId()));
+							readMemo(memo.getId()));
 					sendProcessedDataSingle(robotRecvMessage, message2);
 
 					break;
@@ -206,13 +206,15 @@ public class MemoService extends Servicer<RobotSendMessage2>{
 		         //date = StrToDate(txt1);    
 		         memo.setMemo(txt1);
 		          
-		         
+		       
 		         String txt2 = segment.getData().getText().split("分钟")[0];
 		         int after = Integer.parseInt(txt2);
 		         memo.setWtime(new Date());
 		         Date afterDate = new Date(memo.getWtime().getTime() + after*60000);
 		         memo.setRtime(afterDate);
+		        
 		         
+		        
 		         
 		         try{
 		     		memo.writefile();
@@ -251,7 +253,7 @@ public class MemoService extends Servicer<RobotSendMessage2>{
 				 }
 				 
 								 
-				 if (segment.getData().getText().contains("提醒")){
+				 if (segment.getData().getText().contains("提醒我")){
 						 return CMD.MEMO;
 				 	}
 			 	}
