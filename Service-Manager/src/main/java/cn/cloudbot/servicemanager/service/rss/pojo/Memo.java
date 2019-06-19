@@ -81,7 +81,7 @@ public class Memo {
 		}
 		 String encoding = "GBK";
 		OutputStreamWriter write = new OutputStreamWriter(
-                 new FileOutputStream(writename), "gbk");// 考虑到编码格式
+                 new FileOutputStream(writename,true), "gbk");// 考虑到编码格式
 		BufferedWriter out = new BufferedWriter(write);
 		out.write(t2+":"+this.memo+"\r\n"); // \r\n即为换行s
 		out.flush(); // 把缓存区内容压入文件
